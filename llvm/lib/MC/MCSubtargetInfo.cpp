@@ -9,6 +9,7 @@
 #include "llvm/MC/MCSubtargetInfo.h"
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/StringRef.h"
+#include "llvm/ADT/Triple.h"
 #include "llvm/MC/MCInstrItineraries.h"
 #include "llvm/MC/MCSchedule.h"
 #include "llvm/MC/SubtargetFeature.h"
@@ -21,20 +22,19 @@
 using namespace llvm;
 
 /// Find KV in array using binary search.
-template <typename T>
-static const T *Find(StringRef S, ArrayRef<T> A) {
+template <typename T> static const T *Find(StringRef S, ArrayRef<T> A) {
   // Binary search the array
   auto F = llvm::lower_bound(A, S);
   // If not found then return NULL
-  if (F == A.end() || StringRef(F->Key) != S) return nullptr;
+  if (F == A.end() || StringRef(F->Key) != S)
+    return nullptr;
   // Return the found array item
   return F;
 }
 
 /// For each feature that is (transitively) implied by this feature, set it.
-static
-void SetImpliedBits(FeatureBitset &Bits, const FeatureBitset &Implies,
-                    ArrayRef<SubtargetFeatureKV> FeatureTable) {
+static void SetImpliedBits(FeatureBitset &Bits, const FeatureBitset &Implies,
+                           ArrayRef<SubtargetFeatureKV> FeatureTable) {
   // OR the Implies bits in outside the loop. This allows the Implies for CPUs
   // which might imply features not in FeatureTable to use this.
   Bits |= Implies;
@@ -44,9 +44,8 @@ void SetImpliedBits(FeatureBitset &Bits, const FeatureBitset &Implies,
 }
 
 /// For each feature that (transitively) implies this feature, clear it.
-static
-void ClearImpliedBits(FeatureBitset &Bits, unsigned Value,
-                      ArrayRef<SubtargetFeatureKV> FeatureTable) {
+static void ClearImpliedBits(FeatureBitset &Bits, unsigned Value,
+                             ArrayRef<SubtargetFeatureKV> FeatureTable) {
   for (const SubtargetFeatureKV &FE : FeatureTable) {
     if (FE.Implies.getAsBitset().test(Value)) {
       Bits.reset(FE.Value);
@@ -84,8 +83,7 @@ static void ApplyFeatureFlag(FeatureBitset &Bits, StringRef Feature,
 }
 
 /// Return the length of the longest entry in the table.
-template <typename T>
-static size_t getLongestEntryLength(ArrayRef<T> Table) {
+template <typename T> static size_t getLongestEntryLength(ArrayRef<T> Table) {
   size_t MaxLen = 0;
   for (auto &I : Table)
     MaxLen = std::max(MaxLen, std::strlen(I.Key));
@@ -103,7 +101,7 @@ static void Help(ArrayRef<SubtargetSubTypeKV> CPUTable,
   }
 
   // Determine the length of the longest CPU and Feature entries.
-  unsigned MaxCPULen  = getLongestEntryLength(CPUTable);
+  unsigned MaxCPULen = getLongestEntryLength(CPUTable);
   unsigned MaxFeatLen = getLongestEntryLength(FeatTable);
 
   // Print the CPU table.
@@ -192,7 +190,17 @@ static FeatureBitset getFeatures(StringRef CPU, StringRef FS,
   return Bits;
 }
 
+bool Cpu0DisableUnrecognizedMessage = false;
+
 void MCSubtargetInfo::InitMCProcessorInfo(StringRef CPU, StringRef FS) {
+
+#if 1
+  if (TargetTriple.getArch() == llvm::Triple::cpu0 ||
+      TargetTriple.getArch() == llvm::Triple::cpu0el) {
+    Cpu0DisableUnrecognizedMessage = true;
+  }
+#endif
+
   FeatureBits = getFeatures(CPU, FS, ProcDesc, ProcFeatures);
   if (!CPU.empty())
     CPUSchedModel = &getSchedModelForCPU(CPU);
@@ -228,14 +236,14 @@ FeatureBitset MCSubtargetInfo::ToggleFeature(const FeatureBitset &FB) {
   return FeatureBits;
 }
 
-FeatureBitset MCSubtargetInfo::SetFeatureBitsTransitively(
-  const FeatureBitset &FB) {
+FeatureBitset
+MCSubtargetInfo::SetFeatureBitsTransitively(const FeatureBitset &FB) {
   SetImpliedBits(FeatureBits, FB, ProcFeatures);
   return FeatureBits;
 }
 
-FeatureBitset MCSubtargetInfo::ClearFeatureBitsTransitively(
-  const FeatureBitset &FB) {
+FeatureBitset
+MCSubtargetInfo::ClearFeatureBitsTransitively(const FeatureBitset &FB) {
   for (unsigned I = 0, E = FB.size(); I < E; I++) {
     if (FB[I]) {
       FeatureBits.reset(I);
@@ -296,9 +304,13 @@ const MCSchedModel &MCSubtargetInfo::getSchedModelForCPU(StringRef CPU) const {
 
   if (!CPUEntry) {
     if (CPU != "help") // Don't error if the user asked for help.
-      errs() << "'" << CPU
-             << "' is not a recognized processor for this target"
-             << " (ignoring processor)\n";
+#if 1                  // Disable reconginized processor message. For Cpu0
+      if (TargetTriple.getArch() != llvm::Triple::cpu0 &&
+          TargetTriple.getArch() != llvm::Triple::cpu0el)
+#endif
+        errs() << "'" << CPU
+               << "' is not a recognized processor for this target"
+               << " (ignoring processor)\n";
     return MCSchedModel::GetDefaultSchedModel();
   }
   assert(CPUEntry->SchedModel && "Missing processor SchedModel value");
@@ -329,17 +341,13 @@ Optional<unsigned> MCSubtargetInfo::getCacheLineSize(unsigned Level) const {
   return Optional<unsigned>();
 }
 
-unsigned MCSubtargetInfo::getPrefetchDistance() const {
-  return 0;
-}
+unsigned MCSubtargetInfo::getPrefetchDistance() const { return 0; }
 
 unsigned MCSubtargetInfo::getMaxPrefetchIterationsAhead() const {
   return UINT_MAX;
 }
 
-bool MCSubtargetInfo::enableWritePrefetching() const {
-  return false;
-}
+bool MCSubtargetInfo::enableWritePrefetching() const { return false; }
 
 unsigned MCSubtargetInfo::getMinPrefetchStride(unsigned NumMemAccesses,
                                                unsigned NumStridedMemAccesses,

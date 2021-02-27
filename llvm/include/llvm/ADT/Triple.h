@@ -15,6 +15,7 @@
 // this file.  Undefine them here.
 #undef NetBSD
 #undef mips
+#undef cpu0
 #undef sparc
 
 namespace llvm {
@@ -98,6 +99,8 @@ public:
     renderscript32, // 32-bit RenderScript
     renderscript64, // 64-bit RenderScript
     ve,             // NEC SX-Aurora Vector Engine
+    cpu0,           // Cpu0 for tutorial backend Cpu0
+    cpu0el,         // Cpu0 for tutorial backend Cpu0
     LastArchType = ve
   };
   enum SubArchType {
