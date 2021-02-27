@@ -77,6 +77,7 @@ StringRef Triple::getArchTypeName(ArchType Kind) {
   case xcore:          return "xcore";
   case cpu0:           return "cpu0";
   case cpu0el:         return "cpu0el";
+  case NT:             return "NT";
   }
 
   llvm_unreachable("Invalid ArchType!");
@@ -157,6 +158,7 @@ StringRef Triple::getArchTypePrefix(ArchType Kind) {
     return "cpu0";
   case cpu0el:
     return "cpu0";
+  case NT:          return "NT";
   }
 }
 
@@ -329,6 +331,7 @@ Triple::ArchType Triple::getArchTypeForLLVMName(StringRef Name) {
     .Case("ve", ve)
     .Case("cpu0", cpu0)
     .Case("cpu0el", cpu0el)
+    .Case("NT", NT)
     .Default(UnknownArch);
 }
 
@@ -401,6 +404,7 @@ static Triple::ArchType parseArch(StringRef ArchName) {
   auto AT = StringSwitch<Triple::ArchType>(ArchName)
                 .Cases("cpu0", "cpu0eb", "cpu0allegrex", Triple::cpu0)
                 .Cases("cpu0el", "cpu0allegrexel", Triple::cpu0)
+    .Case("NT", Triple::NT)
                 .Cases("i386", "i486", "i586", "i686", Triple::x86)
                 // FIXME: Do we need to support these?
                 .Cases("i786", "i886", "i986", Triple::x86)
@@ -708,6 +712,7 @@ static Triple::ObjectFormatType getDefaultFormat(const Triple &T) {
   case Triple::mipsel:
   case Triple::cpu0:
   case Triple::cpu0el:
+  case Triple::NT:
   case Triple::msp430:
   case Triple::nvptx64:
   case Triple::nvptx:
@@ -1275,6 +1280,7 @@ static unsigned getArchPointerBitWidth(llvm::Triple::ArchType Arch) {
   case llvm::Triple::mipsel:
   case llvm::Triple::cpu0:
   case llvm::Triple::cpu0el:
+  case llvm::Triple::NT:
   case llvm::Triple::nvptx:
   case llvm::Triple::ppc:
   case llvm::Triple::r600:
@@ -1360,6 +1366,7 @@ Triple Triple::get32BitArchVariant() const {
   case Triple::mipsel:
   case Triple::cpu0:
   case Triple::cpu0el:
+  case Triple::NT:
   case Triple::nvptx:
   case Triple::ppc:
   case Triple::r600:

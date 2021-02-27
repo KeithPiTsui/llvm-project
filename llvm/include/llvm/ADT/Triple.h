@@ -16,6 +16,7 @@
 #undef NetBSD
 #undef mips
 #undef cpu0
+#undef NT
 #undef sparc
 
 namespace llvm {
@@ -101,6 +102,7 @@ public:
     ve,             // NEC SX-Aurora Vector Engine
     cpu0,           // Cpu0 for tutorial backend Cpu0
     cpu0el,         // Cpu0 for tutorial backend Cpu0
+    NT,             // NT for minimal backend registration
     LastArchType = ve
   };
   enum SubArchType {
