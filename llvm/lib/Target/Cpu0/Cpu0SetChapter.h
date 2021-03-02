@@ -1,1 +1,2 @@
-#define CH       CH2
+#define CH       CH12_1
+
