@@ -24,13 +24,14 @@ add_llvm_target(Cpu0CodeGen
   Cpu0RegisterInfo.cpp      ## class Cpu0RegisterInfo
   Cpu0FrameLowering.cpp     ## class Cpu0FrameLowering
 
+  Cpu0SEISelLowering.cpp    ## class Cpu0SETargetLowering
+  Cpu0SEInstrInfo.cpp       ## class Cpu0SEInstrInfo
+  Cpu0SERegisterInfo.cpp    ## class Cpu0SERegisterInfo
+  Cpu0SEFrameLowering.cpp   ## class Cpu0SEFrameLowering
+
   Cpu0TargetObjectFile.cpp  ## class Cpu0TargetObjectFile
   Cpu0MachineFunction.cpp   ## class Cpu0MachineFunction: MachineFunctionInfo
 
-  Cpu0SEFrameLowering.cpp
-  Cpu0SEInstrInfo.cpp
-  Cpu0SEISelLowering.cpp
-  Cpu0SERegisterInfo.cpp
   )
 
 # Should match with "subdirectories =  MCTargetDesc TargetInfo" in LLVMBuild.txt

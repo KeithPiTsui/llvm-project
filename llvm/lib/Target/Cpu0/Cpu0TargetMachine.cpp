@@ -29,7 +29,7 @@ extern "C" void LLVMInitializeCpu0Target() {
   //- Big endian Target Machine
   RegisterTargetMachine<Cpu0ebTargetMachine> X(TheCpu0Target);
   //- Little endian Target Machine
-  //RegisterTargetMachine<Cpu0elTargetMachine> Y(TheCpu0elTarget);
+  RegisterTargetMachine<Cpu0elTargetMachine> Y(TheCpu0elTarget);
 }
 
 static std::string computeDataLayout(const Triple &TT, StringRef CPU,
