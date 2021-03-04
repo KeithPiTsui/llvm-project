@@ -25,14 +25,10 @@
 using namespace llvm;
 
 Cpu0SEInstrInfo::Cpu0SEInstrInfo(const Cpu0Subtarget &STI)
-    : Cpu0InstrInfo(STI),
-      RI(STI) {}
+    : Cpu0InstrInfo(STI), RI(STI) {}
 
-const Cpu0RegisterInfo &Cpu0SEInstrInfo::getRegisterInfo() const {
-  return RI;
-}
+const Cpu0RegisterInfo &Cpu0SEInstrInfo::getRegisterInfo() const { return RI; }
 
 const Cpu0InstrInfo *llvm::createCpu0SEInstrInfo(const Cpu0Subtarget &STI) {
   return new Cpu0SEInstrInfo(STI);
 }
-

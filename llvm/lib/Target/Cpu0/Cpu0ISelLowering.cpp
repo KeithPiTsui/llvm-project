@@ -14,9 +14,9 @@
 #include "Cpu0ISelLowering.h"
 
 #include "Cpu0MachineFunction.h"
+#include "Cpu0Subtarget.h"
 #include "Cpu0TargetMachine.h"
 #include "Cpu0TargetObjectFile.h"
-#include "Cpu0Subtarget.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/CodeGen/CallingConvLower.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -40,17 +40,28 @@ using namespace llvm;
 //@3_1 1 {
 const char *Cpu0TargetLowering::getTargetNodeName(unsigned Opcode) const {
   switch (Opcode) {
-  case Cpu0ISD::JmpLink:           return "Cpu0ISD::JmpLink";
-  case Cpu0ISD::TailCall:          return "Cpu0ISD::TailCall";
-  case Cpu0ISD::Hi:                return "Cpu0ISD::Hi";
-  case Cpu0ISD::Lo:                return "Cpu0ISD::Lo";
-  case Cpu0ISD::GPRel:             return "Cpu0ISD::GPRel";
-  case Cpu0ISD::Ret:               return "Cpu0ISD::Ret";
-  case Cpu0ISD::EH_RETURN:         return "Cpu0ISD::EH_RETURN";
-  case Cpu0ISD::DivRem:            return "Cpu0ISD::DivRem";
-  case Cpu0ISD::DivRemU:           return "Cpu0ISD::DivRemU";
-  case Cpu0ISD::Wrapper:           return "Cpu0ISD::Wrapper";
-  default:                         return NULL;
+  case Cpu0ISD::JmpLink:
+    return "Cpu0ISD::JmpLink";
+  case Cpu0ISD::TailCall:
+    return "Cpu0ISD::TailCall";
+  case Cpu0ISD::Hi:
+    return "Cpu0ISD::Hi";
+  case Cpu0ISD::Lo:
+    return "Cpu0ISD::Lo";
+  case Cpu0ISD::GPRel:
+    return "Cpu0ISD::GPRel";
+  case Cpu0ISD::Ret:
+    return "Cpu0ISD::Ret";
+  case Cpu0ISD::EH_RETURN:
+    return "Cpu0ISD::EH_RETURN";
+  case Cpu0ISD::DivRem:
+    return "Cpu0ISD::DivRem";
+  case Cpu0ISD::DivRemU:
+    return "Cpu0ISD::DivRemU";
+  case Cpu0ISD::Wrapper:
+    return "Cpu0ISD::Wrapper";
+  default:
+    return NULL;
   }
 }
 //@3_1 1 }
@@ -58,12 +69,11 @@ const char *Cpu0TargetLowering::getTargetNodeName(unsigned Opcode) const {
 //@Cpu0TargetLowering {
 Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
                                        const Cpu0Subtarget &STI)
-    : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {
+    : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {}
 
-}
-
-const Cpu0TargetLowering *Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
-                                                     const Cpu0Subtarget &STI) {
+const Cpu0TargetLowering *
+Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
+                           const Cpu0Subtarget &STI) {
   return llvm::createCpu0SETargetLowering(TM, STI);
 }
 
@@ -84,14 +94,10 @@ const Cpu0TargetLowering *Cpu0TargetLowering::create(const Cpu0TargetMachine &TM
 //@LowerFormalArguments {
 /// LowerFormalArguments - transform physical registers into virtual registers
 /// and generate load operations for arguments places on the stack.
-SDValue
-Cpu0TargetLowering::LowerFormalArguments(SDValue Chain,
-                                         CallingConv::ID CallConv,
-                                         bool IsVarArg,
-                                         const SmallVectorImpl<ISD::InputArg> &Ins,
-                                         const SDLoc &DL, SelectionDAG &DAG,
-                                         SmallVectorImpl<SDValue> &InVals)
-                                          const {
+SDValue Cpu0TargetLowering::LowerFormalArguments(
+    SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
+    const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
+    SelectionDAG &DAG, SmallVectorImpl<SDValue> &InVals) const {
 
   return Chain;
 }
@@ -102,12 +108,11 @@ Cpu0TargetLowering::LowerFormalArguments(SDValue Chain,
 //===----------------------------------------------------------------------===//
 
 SDValue
-Cpu0TargetLowering::LowerReturn(SDValue Chain,
-                                CallingConv::ID CallConv, bool IsVarArg,
+Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
+                                bool IsVarArg,
                                 const SmallVectorImpl<ISD::OutputArg> &Outs,
                                 const SmallVectorImpl<SDValue> &OutVals,
                                 const SDLoc &DL, SelectionDAG &DAG) const {
-  return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other,
-                     Chain, DAG.getRegister(Cpu0::LR, MVT::i32));
+  return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other, Chain,
+                     DAG.getRegister(Cpu0::LR, MVT::i32));
 }
-

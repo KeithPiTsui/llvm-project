@@ -17,8 +17,8 @@
 #include "Cpu0Config.h"
 
 #include "Cpu0InstrInfo.h"
-#include "Cpu0SERegisterInfo.h"
 #include "Cpu0MachineFunction.h"
+#include "Cpu0SERegisterInfo.h"
 
 namespace llvm {
 
@@ -29,11 +29,8 @@ public:
   explicit Cpu0SEInstrInfo(const Cpu0Subtarget &STI);
 
   const Cpu0RegisterInfo &getRegisterInfo() const override;
-
-  
 };
 
-}
+} // namespace llvm
 
 #endif
-

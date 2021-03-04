@@ -34,18 +34,15 @@ Cpu0SEFrameLowering::Cpu0SEFrameLowering(const Cpu0Subtarget &STI)
 
 //@emitPrologue {
 void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
-                                       MachineBasicBlock &MBB) const {
-}
+                                       MachineBasicBlock &MBB) const {}
 //}
 
 //@emitEpilogue {
 void Cpu0SEFrameLowering::emitEpilogue(MachineFunction &MF,
-                                 MachineBasicBlock &MBB) const {
-}
+                                       MachineBasicBlock &MBB) const {}
 //}
 
 const Cpu0FrameLowering *
 llvm::createCpu0SEFrameLowering(const Cpu0Subtarget &ST) {
   return new Cpu0SEFrameLowering(ST);
 }
-

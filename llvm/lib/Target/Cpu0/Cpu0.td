@@ -10,13 +10,6 @@
 //===----------------------------------------------------------------------===//
 // Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//
-
-include "Cpu0Schedule.td"
-include "Cpu0InstrInfo.td"
-include "Cpu0CallingConv.td"
-
-def Cpu0InstrInfo : InstrInfo;
-
 // Without this will have error: 'cpu032I' is not a recognized processor for 
 //  this target (ignoring processor)
 //===----------------------------------------------------------------------===//
@@ -85,6 +78,14 @@ def FeatureCpu032I     : SubtargetFeature<"cpu032I", "Cpu0ArchVersion",
 def FeatureCpu032II    : SubtargetFeature<"cpu032II", "Cpu0ArchVersion",                      
                                "Cpu032II", "Cpu032II ISA Support (slt)",
                                 [FeatureCmp, FeatureSlt, FeatureChapterAll]>;
+
+
+include "Cpu0Schedule.td"
+include "Cpu0InstrInfo.td"
+include "Cpu0CallingConv.td"
+
+def Cpu0InstrInfo : InstrInfo;
+
 
 //===----------------------------------------------------------------------===//
 // Cpu0 processors supported.

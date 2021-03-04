@@ -16,7 +16,8 @@
 #include "Cpu0Config.h"
 
 #include "Cpu0.h"
-#include "llvm/Target/TargetFrameLowering.h"
+#include "llvm/CodeGen/TargetFrameLowering.h"
+#include "llvm/Support/Alignment.h"
 
 namespace llvm {
   class Cpu0Subtarget;
@@ -26,7 +27,7 @@ protected:
   const Cpu0Subtarget &STI;
 
 public:
-  explicit Cpu0FrameLowering(const Cpu0Subtarget &sti, unsigned Alignment)
+  explicit Cpu0FrameLowering(const Cpu0Subtarget &sti, Align Alignment)
     : TargetFrameLowering(StackGrowsDown, Alignment, 0, Alignment),
       STI(sti) {
   }

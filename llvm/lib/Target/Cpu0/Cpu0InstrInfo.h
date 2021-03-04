@@ -19,7 +19,7 @@
 #include "Cpu0.h"
 #include "Cpu0RegisterInfo.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
-#include "llvm/Target/TargetInstrInfo.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
 
 #define GET_INSTRINFO_HEADER
 #include "Cpu0GenInstrInfo.inc"

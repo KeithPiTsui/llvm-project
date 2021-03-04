@@ -183,13 +183,13 @@ multiclass LoadM32<bits<8> op, string instr_asm, PatFrag OpNode,
                    bit Pseudo = 0> {
 // When defm LD : LoadM32<...>, then #NAME# is LD
 // When defm LB : LoadM32<...>, then #NAME# is LB
-  def #NAME# : LoadM<op, instr_asm, OpNode, GPROut, mem, Pseudo>;
+  def  : LoadM<op, instr_asm, OpNode, GPROut, mem, Pseudo>;
 }
 
 // 32-bit store.
 multiclass StoreM32<bits<8> op, string instr_asm, PatFrag OpNode,
                     bit Pseudo = 0> {
-  def #NAME# : StoreM<op, instr_asm, OpNode, CPURegs, mem, Pseudo>;
+  def  : StoreM<op, instr_asm, OpNode, CPURegs, mem, Pseudo>;
 }
 
 //@JumpFR {

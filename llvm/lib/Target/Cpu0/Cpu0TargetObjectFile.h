@@ -17,16 +17,14 @@
 
 namespace llvm {
 class Cpu0TargetMachine;
-  class Cpu0TargetObjectFile : public TargetLoweringObjectFileELF {
-    MCSection *SmallDataSection;
-    MCSection *SmallBSSSection;
-    const Cpu0TargetMachine *TM;
-  public:
+class Cpu0TargetObjectFile : public TargetLoweringObjectFileELF {
+  MCSection *SmallDataSection;
+  MCSection *SmallBSSSection;
+  const Cpu0TargetMachine *TM;
 
-    void Initialize(MCContext &Ctx, const TargetMachine &TM) override;
-
-  };
+public:
+  void Initialize(MCContext &Ctx, const TargetMachine &TM) override;
+};
 } // end namespace llvm
 
 #endif
-

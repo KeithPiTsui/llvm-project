@@ -28,10 +28,8 @@ public:
   /// the function.
   void emitPrologue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
   void emitEpilogue(MachineFunction &MF, MachineBasicBlock &MBB) const override;
-
 };
 
-} // End llvm namespace
+} // namespace llvm
 
 #endif
-

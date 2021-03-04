@@ -23,6 +23,7 @@
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/MC/MCInstrItineraries.h"
+#include "llvm/Support/Alignment.h"
 #include <string>
 
 #define GET_SUBTARGETINFO_HEADER
@@ -138,7 +139,7 @@ public:
 
   bool enableLongBranchPass() const { return hasCpu032II(); }
 
-  unsigned stackAlignment() const { return 8; }
+  Align stackAlignment() const { return Align(8); }
 
   Cpu0Subtarget &initializeSubtargetDependencies(StringRef CPU, StringRef FS,
                                                  const TargetMachine &TM);
@@ -146,7 +147,7 @@ public:
   const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
     return &TSInfo;
   }
-  const Cpu0InstrInfo *getInstrInfo() const override { return InstrInfo.get(); }
+  const Cpu0InstrInfo* getInstrInfo() const override { return InstrInfo.get(); }
   const TargetFrameLowering *getFrameLowering() const override {
     return FrameLowering.get();
   }

@@ -11,9 +11,9 @@
 
 #include "Cpu0InstrInfo.h"
 #include "Cpu0Subtarget.h"
-#include "llvm/IR/Function.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
+#include "llvm/IR/Function.h"
 
 using namespace llvm;
 
@@ -21,5 +21,4 @@ bool FixGlobalBaseReg;
 
 Cpu0FunctionInfo::~Cpu0FunctionInfo() {}
 
-void Cpu0FunctionInfo::anchor() { }
-
+void Cpu0FunctionInfo::anchor() {}

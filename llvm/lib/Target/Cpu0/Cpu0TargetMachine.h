@@ -16,8 +16,8 @@
 
 #include "Cpu0Config.h"
 
-#include "MCTargetDesc/Cpu0ABIInfo.h"
 #include "Cpu0Subtarget.h"
+#include "MCTargetDesc/Cpu0ABIInfo.h"
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/SelectionDAGISel.h"
 #include "llvm/CodeGen/TargetFrameLowering.h"
@@ -36,16 +36,15 @@ class Cpu0TargetMachine : public LLVMTargetMachine {
   Cpu0Subtarget DefaultSubtarget;
 
   mutable StringMap<std::unique_ptr<Cpu0Subtarget>> SubtargetMap;
+
 public:
   Cpu0TargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                     StringRef FS, const TargetOptions &Options,
-                    Optional<Reloc::Model> RM, CodeModel::Model CM,
-                    CodeGenOpt::Level OL, bool isLittle);
+                    Optional<Reloc::Model> RM, Optional<CodeModel::Model> CM,
+                    CodeGenOpt::Level OL, bool JIT, bool isLittle);
   ~Cpu0TargetMachine() override;
 
-  const Cpu0Subtarget *getSubtargetImpl() const {
-    return &DefaultSubtarget;
-  }
+  const Cpu0Subtarget *getSubtargetImpl() const { return &DefaultSubtarget; }
 
   const Cpu0Subtarget *getSubtargetImpl(const Function &F) const override;
 
@@ -63,24 +62,27 @@ public:
 ///
 class Cpu0ebTargetMachine : public Cpu0TargetMachine {
   virtual void anchor();
+
 public:
   Cpu0ebTargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                       StringRef FS, const TargetOptions &Options,
-                      Optional<Reloc::Model> RM, CodeModel::Model CM,
-                      CodeGenOpt::Level OL);
+                      Optional<Reloc::Model> RM, Optional<CodeModel::Model> CM,
+                      CodeGenOpt::Level OL,
+                      bool JIT);
 };
 
 /// Cpu0elTargetMachine - Cpu032 little endian target machine.
 ///
 class Cpu0elTargetMachine : public Cpu0TargetMachine {
   virtual void anchor();
+
 public:
   Cpu0elTargetMachine(const Target &T, const Triple &TT, StringRef CPU,
                       StringRef FS, const TargetOptions &Options,
-                      Optional<Reloc::Model> RM, CodeModel::Model CM,
-                      CodeGenOpt::Level OL);
+                      Optional<Reloc::Model> RM, Optional<CodeModel::Model> CM,
+                      CodeGenOpt::Level OL,
+                      bool JIT);
 };
-} // End llvm namespace
+} // namespace llvm
 
 #endif
-

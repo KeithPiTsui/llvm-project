@@ -20,7 +20,7 @@
 #include "llvm/CodeGen/MachineFunction.h"
 #include "llvm/CodeGen/MachineMemOperand.h"
 #include "llvm/CodeGen/PseudoSourceValue.h"
-#include "llvm/Target/TargetFrameLowering.h"
+#include "llvm/CodeGen/TargetFrameLowering.h"
 #include "llvm/Target/TargetMachine.h"
 #include <map>
 
@@ -31,11 +31,8 @@ namespace llvm {
 /// Cpu0 target-specific information for each MachineFunction.
 class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
-  Cpu0FunctionInfo(MachineFunction& MF)
-  : MF(MF), 
-    VarArgsFrameIndex(0), 
-    MaxCallFrameSize(0)
-    {}
+  Cpu0FunctionInfo(MachineFunction &MF)
+      : MF(MF), VarArgsFrameIndex(0), MaxCallFrameSize(0) {}
 
   ~Cpu0FunctionInfo();
 
@@ -45,9 +42,9 @@ public:
 private:
   virtual void anchor();
 
-  MachineFunction& MF;
+  MachineFunction &MF;
 
-    /// VarArgsFrameIndex - FrameIndex for start of varargs area.
+  /// VarArgsFrameIndex - FrameIndex for start of varargs area.
   int VarArgsFrameIndex;
 
   unsigned MaxCallFrameSize;
@@ -57,4 +54,3 @@ private:
 } // end of namespace llvm
 
 #endif // CPU0_MACHINE_FUNCTION_INFO_H
-
