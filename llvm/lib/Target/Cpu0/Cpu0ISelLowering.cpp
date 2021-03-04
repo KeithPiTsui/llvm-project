@@ -76,7 +76,7 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
 
   // must, computeRegisterProperties - Once all of the register classes are
   //  added, this allows us to compute derived properties we expose.
-  computeRegisterProperties(STI.getRegisterInfo());
+  //computeRegisterProperties(STI.getRegisterInfo());
 }
 
 // Cpu0TargetLowering::Cpu0TargetLowering(Cpu0TargetMachine &TM)
