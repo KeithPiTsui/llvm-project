@@ -58,9 +58,9 @@ static std::string computeDataLayout(const Triple &TT, StringRef CPU,
   return Ret;
 }
 
-static Reloc::Model getEffectiveRelocModel(Optional<CodeModel::Model> CM,
+static Reloc::Model getEffectiveRelocModel(bool JIT,
                                            Optional<Reloc::Model> RM) {
-  if (!RM.hasValue()) // || CM == CodeModel::JITDefault)
+  if (!RM.hasValue() || JIT)
     return Reloc::Static;
   return *RM;
 }
@@ -82,8 +82,8 @@ Cpu0TargetMachine::Cpu0TargetMachine(const Target &T, const Triple &TT,
                                      bool isLittle)
     //- Default is big endian
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
-                        CPU, FS, Options, getEffectiveRelocModel(CM, RM),
-                        CM.getValue(), OL),
+                        CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
+                        getEffectiveCodeModel(CM, CodeModel::Small), OL),
       isLittle(isLittle), TLOF(std::make_unique<Cpu0TargetObjectFile>()),
       ABI(Cpu0ABIInfo::computeTargetABI()),
       /// This constructor initializes the data members to match that
