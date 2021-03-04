@@ -69,7 +69,28 @@ const char *Cpu0TargetLowering::getTargetNodeName(unsigned Opcode) const {
 //@Cpu0TargetLowering {
 Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
                                        const Cpu0Subtarget &STI)
-    : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {}
+    : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {
+  //- Set .align 2
+  // It will emit .align 2 later
+  setMinFunctionAlignment(Align(2));
+
+  // must, computeRegisterProperties - Once all of the register classes are
+  //  added, this allows us to compute derived properties we expose.
+  computeRegisterProperties(STI.getRegisterInfo());
+}
+
+// Cpu0TargetLowering::Cpu0TargetLowering(Cpu0TargetMachine &TM)
+//     : TargetLowering(TM, new Cpu0TargetObjectFile()),
+//       Subtarget(&TM.getSubtarget<Cpu0Subtarget>()) {
+
+//   //- Set .align 2
+//   // It will emit .align 2 later
+//   setMinFunctionAlignment(2);
+
+//   // must, computeRegisterProperties - Once all of the register classes are
+//   //  added, this allows us to compute derived properties we expose.
+//   computeRegisterProperties();
+// }
 
 const Cpu0TargetLowering *
 Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
