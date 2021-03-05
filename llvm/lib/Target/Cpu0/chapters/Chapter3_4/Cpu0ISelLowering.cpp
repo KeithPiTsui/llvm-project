@@ -13,11 +13,11 @@
 //===----------------------------------------------------------------------===//
 #include "Cpu0ISelLowering.h"
 
-#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "Cpu0MachineFunction.h"
+#include "Cpu0Subtarget.h"
 #include "Cpu0TargetMachine.h"
 #include "Cpu0TargetObjectFile.h"
-#include "Cpu0Subtarget.h"
+#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/CodeGen/CallingConvLower.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -41,17 +41,28 @@ using namespace llvm;
 //@3_1 1 {
 const char *Cpu0TargetLowering::getTargetNodeName(unsigned Opcode) const {
   switch (Opcode) {
-  case Cpu0ISD::JmpLink:           return "Cpu0ISD::JmpLink";
-  case Cpu0ISD::TailCall:          return "Cpu0ISD::TailCall";
-  case Cpu0ISD::Hi:                return "Cpu0ISD::Hi";
-  case Cpu0ISD::Lo:                return "Cpu0ISD::Lo";
-  case Cpu0ISD::GPRel:             return "Cpu0ISD::GPRel";
-  case Cpu0ISD::Ret:               return "Cpu0ISD::Ret";
-  case Cpu0ISD::EH_RETURN:         return "Cpu0ISD::EH_RETURN";
-  case Cpu0ISD::DivRem:            return "Cpu0ISD::DivRem";
-  case Cpu0ISD::DivRemU:           return "Cpu0ISD::DivRemU";
-  case Cpu0ISD::Wrapper:           return "Cpu0ISD::Wrapper";
-  default:                         return NULL;
+  case Cpu0ISD::JmpLink:
+    return "Cpu0ISD::JmpLink";
+  case Cpu0ISD::TailCall:
+    return "Cpu0ISD::TailCall";
+  case Cpu0ISD::Hi:
+    return "Cpu0ISD::Hi";
+  case Cpu0ISD::Lo:
+    return "Cpu0ISD::Lo";
+  case Cpu0ISD::GPRel:
+    return "Cpu0ISD::GPRel";
+  case Cpu0ISD::Ret:
+    return "Cpu0ISD::Ret";
+  case Cpu0ISD::EH_RETURN:
+    return "Cpu0ISD::EH_RETURN";
+  case Cpu0ISD::DivRem:
+    return "Cpu0ISD::DivRem";
+  case Cpu0ISD::DivRemU:
+    return "Cpu0ISD::DivRemU";
+  case Cpu0ISD::Wrapper:
+    return "Cpu0ISD::Wrapper";
+  default:
+    return NULL;
   }
 }
 //@3_1 1 }
@@ -65,14 +76,14 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
 
   // Operations not directly supported by Cpu0.
 
-//- Set .align 2
-// It will emit .align 2 later
+  //- Set .align 2
+  // It will emit .align 2 later
   setMinFunctionAlignment(2);
-
 }
 
-const Cpu0TargetLowering *Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
-                                                     const Cpu0Subtarget &STI) {
+const Cpu0TargetLowering *
+Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
+                           const Cpu0Subtarget &STI) {
   return llvm::createCpu0SETargetLowering(TM, STI);
 }
 
@@ -93,14 +104,10 @@ const Cpu0TargetLowering *Cpu0TargetLowering::create(const Cpu0TargetMachine &TM
 //@LowerFormalArguments {
 /// LowerFormalArguments - transform physical registers into virtual registers
 /// and generate load operations for arguments places on the stack.
-SDValue
-Cpu0TargetLowering::LowerFormalArguments(SDValue Chain,
-                                         CallingConv::ID CallConv,
-                                         bool IsVarArg,
-                                         const SmallVectorImpl<ISD::InputArg> &Ins,
-                                         const SDLoc &DL, SelectionDAG &DAG,
-                                         SmallVectorImpl<SDValue> &InVals)
-                                          const {
+SDValue Cpu0TargetLowering::LowerFormalArguments(
+    SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
+    const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
+    SelectionDAG &DAG, SmallVectorImpl<SDValue> &InVals) const {
   MachineFunction &MF = DAG.getMachineFunction();
   MachineFrameInfo *MFI = MF.getFrameInfo();
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
@@ -109,10 +116,9 @@ Cpu0TargetLowering::LowerFormalArguments(SDValue Chain,
 
   // Assign locations to all of the incoming arguments.
   SmallVector<CCValAssign, 16> ArgLocs;
-  CCState CCInfo(CallConv, IsVarArg, DAG.getMachineFunction(),
-                 ArgLocs, *DAG.getContext());
-  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), 
-                    CCInfo);
+  CCState CCInfo(CallConv, IsVarArg, DAG.getMachineFunction(), ArgLocs,
+                 *DAG.getContext());
+  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), CCInfo);
 
   Cpu0FI->setFormalArgInfo(CCInfo.getNextStackOffset(),
                            Cpu0CCInfo.hasByValArg());
@@ -126,8 +132,8 @@ Cpu0TargetLowering::LowerFormalArguments(SDValue Chain,
 //===----------------------------------------------------------------------===//
 
 SDValue
-Cpu0TargetLowering::LowerReturn(SDValue Chain,
-                                CallingConv::ID CallConv, bool IsVarArg,
+Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
+                                bool IsVarArg,
                                 const SmallVectorImpl<ISD::OutputArg> &Outs,
                                 const SmallVectorImpl<SDValue> &OutVals,
                                 const SDLoc &DL, SelectionDAG &DAG) const {
@@ -137,10 +143,8 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain,
   MachineFunction &MF = DAG.getMachineFunction();
 
   // CCState - Info about the registers and stack slot.
-  CCState CCInfo(CallConv, IsVarArg, MF, RVLocs,
-                 *DAG.getContext());
-  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), 
-                    CCInfo);
+  CCState CCInfo(CallConv, IsVarArg, MF, RVLocs, *DAG.getContext());
+  Cpu0CC Cpu0CCInfo(CallConv, ABI.IsO32(), CCInfo);
 
   // Analyze return values.
   Cpu0CCInfo.analyzeReturn(Outs, Subtarget.abiUsesSoftFloat(),
@@ -165,7 +169,7 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain,
     RetOps.push_back(DAG.getRegister(VA.getLocReg(), VA.getLocVT()));
   }
 
-//@Ordinary struct type: 2 {
+  //@Ordinary struct type: 2 {
   // The cpu0 ABIs for returning structs by value requires that we copy
   // the sret argument into $v0 for the return. We saved the argument into
   // a virtual register in the entry block, so now we copy the value out
@@ -184,9 +188,9 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain,
     Flag = Chain.getValue(1);
     RetOps.push_back(DAG.getRegister(V0, getPointerTy(DAG.getDataLayout())));
   }
-//@Ordinary struct type: 2 }
+  //@Ordinary struct type: 2 }
 
-  RetOps[0] = Chain;  // Update chain.
+  RetOps[0] = Chain; // Update chain.
 
   // Add the flag if we have it.
   if (Flag.getNode())
@@ -197,17 +201,17 @@ Cpu0TargetLowering::LowerReturn(SDValue Chain,
 }
 
 Cpu0TargetLowering::Cpu0CC::Cpu0CC(
-  CallingConv::ID CC, bool IsO32_, CCState &Info,
-  Cpu0CC::SpecialCallingConvType SpecialCallingConv_)
-  : CCInfo(Info), CallConv(CC), IsO32(IsO32_) {
+    CallingConv::ID CC, bool IsO32_, CCState &Info,
+    Cpu0CC::SpecialCallingConvType SpecialCallingConv_)
+    : CCInfo(Info), CallConv(CC), IsO32(IsO32_) {
   // Pre-allocate reserved argument area.
   CCInfo.AllocateStack(reservedArgArea(), 1);
 }
 
-template<typename Ty>
-void Cpu0TargetLowering::Cpu0CC::
-analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
-              const SDNode *CallNode, const Type *RetTy) const {
+template <typename Ty>
+void Cpu0TargetLowering::Cpu0CC::analyzeReturn(
+    const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
+    const SDNode *CallNode, const Type *RetTy) const {
   CCAssignFn *Fn;
 
   Fn = RetCC_Cpu0;
@@ -227,15 +231,15 @@ analyzeReturn(const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
   }
 }
 
-void Cpu0TargetLowering::Cpu0CC::
-analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins, bool IsSoftFloat,
-                  const SDNode *CallNode, const Type *RetTy) const {
+void Cpu0TargetLowering::Cpu0CC::analyzeCallResult(
+    const SmallVectorImpl<ISD::InputArg> &Ins, bool IsSoftFloat,
+    const SDNode *CallNode, const Type *RetTy) const {
   analyzeReturn(Ins, IsSoftFloat, CallNode, RetTy);
 }
 
-void Cpu0TargetLowering::Cpu0CC::
-analyzeReturn(const SmallVectorImpl<ISD::OutputArg> &Outs, bool IsSoftFloat,
-              const Type *RetTy) const {
+void Cpu0TargetLowering::Cpu0CC::analyzeReturn(
+    const SmallVectorImpl<ISD::OutputArg> &Outs, bool IsSoftFloat,
+    const Type *RetTy) const {
   analyzeReturn(Outs, IsSoftFloat, nullptr, RetTy);
 }
 
@@ -251,4 +255,3 @@ MVT Cpu0TargetLowering::Cpu0CC::getRegVT(MVT VT, const Type *OrigTy,
 
   return VT;
 }
-

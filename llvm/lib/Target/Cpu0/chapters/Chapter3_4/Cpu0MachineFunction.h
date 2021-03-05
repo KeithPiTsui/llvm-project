@@ -31,13 +31,9 @@ namespace llvm {
 /// Cpu0 target-specific information for each MachineFunction.
 class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
-  Cpu0FunctionInfo(MachineFunction& MF)
-  : MF(MF), 
-    SRetReturnReg(0), CallsEhReturn(false), CallsEhDwarf(false),
-    VarArgsFrameIndex(0), 
-    EmitNOAT(false),
-    MaxCallFrameSize(0)
-    {}
+  Cpu0FunctionInfo(MachineFunction &MF)
+      : MF(MF), SRetReturnReg(0), CallsEhReturn(false), CallsEhDwarf(false),
+        VarArgsFrameIndex(0), EmitNOAT(false), MaxCallFrameSize(0) {}
 
   ~Cpu0FunctionInfo();
 
@@ -59,14 +55,14 @@ public:
 private:
   virtual void anchor();
 
-  MachineFunction& MF;
+  MachineFunction &MF;
 
   /// SRetReturnReg - Some subtargets require that sret lowering includes
   /// returning the value of the returned struct in a register. This field
   /// holds the virtual register into which the sret argument is passed.
   unsigned SRetReturnReg;
 
-    /// VarArgsFrameIndex - FrameIndex for start of varargs area.
+  /// VarArgsFrameIndex - FrameIndex for start of varargs area.
   int VarArgsFrameIndex;
 
   /// True if function has a byval argument.
@@ -92,4 +88,3 @@ private:
 } // end of namespace llvm
 
 #endif // CPU0_MACHINE_FUNCTION_INFO_H
-

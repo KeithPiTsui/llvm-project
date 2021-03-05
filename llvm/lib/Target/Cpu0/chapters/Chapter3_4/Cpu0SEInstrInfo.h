@@ -17,8 +17,8 @@
 #include "Cpu0Config.h"
 
 #include "Cpu0InstrInfo.h"
-#include "Cpu0SERegisterInfo.h"
 #include "Cpu0MachineFunction.h"
+#include "Cpu0SERegisterInfo.h"
 
 namespace llvm {
 
@@ -30,16 +30,13 @@ public:
 
   const Cpu0RegisterInfo &getRegisterInfo() const override;
 
-//@expandPostRAPseudo
+  //@expandPostRAPseudo
   bool expandPostRAPseudo(MachineInstr &MI) const override;
 
 private:
   void expandRetLR(MachineBasicBlock &MBB, MachineBasicBlock::iterator I) const;
-
-  
 };
 
-}
+} // namespace llvm
 
 #endif
-

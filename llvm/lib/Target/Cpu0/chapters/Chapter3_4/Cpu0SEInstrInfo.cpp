@@ -13,9 +13,9 @@
 
 #include "Cpu0SEInstrInfo.h"
 
-#include "InstPrinter/Cpu0InstPrinter.h"
 #include "Cpu0MachineFunction.h"
 #include "Cpu0TargetMachine.h"
+#include "InstPrinter/Cpu0InstPrinter.h"
 #include "llvm/ADT/STLExtras.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
@@ -26,17 +26,14 @@
 using namespace llvm;
 
 Cpu0SEInstrInfo::Cpu0SEInstrInfo(const Cpu0Subtarget &STI)
-    : Cpu0InstrInfo(STI),
-      RI(STI) {}
+    : Cpu0InstrInfo(STI), RI(STI) {}
 
-const Cpu0RegisterInfo &Cpu0SEInstrInfo::getRegisterInfo() const {
-  return RI;
-}
+const Cpu0RegisterInfo &Cpu0SEInstrInfo::getRegisterInfo() const { return RI; }
 
 //@expandPostRAPseudo
 /// Expand Pseudo instructions into real backend instructions
 bool Cpu0SEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
-//@expandPostRAPseudo-body
+  //@expandPostRAPseudo-body
   MachineBasicBlock &MBB = *MI.getParent();
 
   switch (MI.getDesc().getOpcode()) {
@@ -52,11 +49,10 @@ bool Cpu0SEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
 }
 
 void Cpu0SEInstrInfo::expandRetLR(MachineBasicBlock &MBB,
-                                MachineBasicBlock::iterator I) const {
+                                  MachineBasicBlock::iterator I) const {
   BuildMI(MBB, I, I->getDebugLoc(), get(Cpu0::RET)).addReg(Cpu0::LR);
 }
 
 const Cpu0InstrInfo *llvm::createCpu0SEInstrInfo(const Cpu0Subtarget &STI) {
   return new Cpu0SEInstrInfo(STI);
 }
-
