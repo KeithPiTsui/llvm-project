@@ -13,10 +13,10 @@
 
 #include "Cpu0SEISelDAGToDAG.h"
 
-#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "Cpu0.h"
 #include "Cpu0MachineFunction.h"
 #include "Cpu0RegisterInfo.h"
+#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "llvm/CodeGen/MachineConstantPool.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
@@ -41,8 +41,7 @@ bool Cpu0SEDAGToDAGISel::runOnMachineFunction(MachineFunction &MF) {
   return Cpu0DAGToDAGISel::runOnMachineFunction(MF);
 }
 
-void Cpu0SEDAGToDAGISel::processFunctionAfterISel(MachineFunction &MF) {
-}
+void Cpu0SEDAGToDAGISel::processFunctionAfterISel(MachineFunction &MF) {}
 
 //@selectNode
 bool Cpu0SEDAGToDAGISel::trySelect(SDNode *Node) {
@@ -61,9 +60,9 @@ bool Cpu0SEDAGToDAGISel::trySelect(SDNode *Node) {
   EVT NodeTy = Node->getValueType(0);
   unsigned MultOpc;
 
-  switch(Opcode) {
-  default: break;
-
+  switch (Opcode) {
+  default:
+    break;
   }
 
   return false;
@@ -73,4 +72,3 @@ FunctionPass *llvm::createCpu0SEISelDag(Cpu0TargetMachine &TM,
                                         CodeGenOpt::Level OptLevel) {
   return new Cpu0SEDAGToDAGISel(TM, OptLevel);
 }
-

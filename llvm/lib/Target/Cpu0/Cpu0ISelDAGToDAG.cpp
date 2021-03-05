@@ -56,21 +56,21 @@ bool Cpu0DAGToDAGISel::runOnMachineFunction(MachineFunction &MF) {
 //@SelectAddr {
 /// ComplexPattern used on Cpu0InstrInfo
 /// Used on Cpu0 Load/Store instructions
-bool Cpu0DAGToDAGISel::
-SelectAddr(SDNode *Parent, SDValue Addr, SDValue &Base, SDValue &Offset) {
-//@SelectAddr }
+bool Cpu0DAGToDAGISel::SelectAddr(SDNode *Parent, SDValue Addr, SDValue &Base,
+                                  SDValue &Offset) {
+  //@SelectAddr }
   EVT ValTy = Addr.getValueType();
   SDLoc DL(Addr);
 
   // If Parent is an unaligned f32 load or store, select a (base + index)
   // floating point load/store instruction (luxc1 or suxc1).
-  const LSBaseSDNode* LS = 0;
+  const LSBaseSDNode *LS = 0;
 
   if (Parent && (LS = dyn_cast<LSBaseSDNode>(Parent))) {
     EVT VT = LS->getMemoryVT();
 
     if (VT.getSizeInBits() / 8 > LS->getAlignment()) {
-      assert("Unaligned loads/stores not supported for this type.");
+      assert(false && "Unaligned loads/stores not supported for this type.");
       if (VT == MVT::f32)
         return false;
     }
@@ -78,12 +78,12 @@ SelectAddr(SDNode *Parent, SDValue Addr, SDValue &Base, SDValue &Offset) {
 
   // if Address is FI, get the TargetFrameIndex.
   if (FrameIndexSDNode *FIN = dyn_cast<FrameIndexSDNode>(Addr)) {
-    Base   = CurDAG->getTargetFrameIndex(FIN->getIndex(), ValTy);
+    Base = CurDAG->getTargetFrameIndex(FIN->getIndex(), ValTy);
     Offset = CurDAG->getTargetConstant(0, DL, ValTy);
     return true;
   }
 
-  Base   = Addr;
+  Base = Addr;
   Offset = CurDAG->getTargetConstant(0, DL, ValTy);
   return true;
 }
@@ -92,15 +92,15 @@ SelectAddr(SDNode *Parent, SDValue Addr, SDValue &Base, SDValue &Offset) {
 /// Select instructions not customized! Used for
 /// expanded, promoted and normal instructions
 void Cpu0DAGToDAGISel::Select(SDNode *Node) {
-//@Select }
+  //@Select }
   unsigned Opcode = Node->getOpcode();
 
   // Dump information about the Node being selected
-  DEBUG(errs() << "Selecting: "; Node->dump(CurDAG); errs() << "\n");
+  // DEBUG(errs() << "Selecting: "; Node->dump(CurDAG); errs() << "\n");
 
   // If we have a custom node, we already have selected!
   if (Node->isMachineOpcode()) {
-    DEBUG(errs() << "== "; Node->dump(CurDAG); errs() << "\n");
+    //DEBUG(errs() << "== "; Node->dump(CurDAG); errs() << "\n");
     Node->setNodeId(-1);
     return;
   }
@@ -109,12 +109,11 @@ void Cpu0DAGToDAGISel::Select(SDNode *Node) {
   if (trySelect(Node))
     return;
 
-  switch(Opcode) {
-  default: break;
-
+  switch (Opcode) {
+  default:
+    break;
   }
 
   // Select the default instruction
   SelectCode(Node);
 }
-
