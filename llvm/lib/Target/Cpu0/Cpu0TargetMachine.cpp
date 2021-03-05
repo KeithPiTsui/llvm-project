@@ -20,6 +20,8 @@
 #include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Support/TargetRegistry.h"
+
+#include "Cpu0SEISelDAGToDAG.h"
 using namespace llvm;
 
 #define DEBUG_TYPE "cpu0"
@@ -83,8 +85,7 @@ Cpu0TargetMachine::Cpu0TargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
-      isLittle(isLittle),
-      TLOF(std::make_unique<Cpu0TargetObjectFile>()),
+      isLittle(isLittle), TLOF(std::make_unique<Cpu0TargetObjectFile>()),
       ABI(Cpu0ABIInfo::computeTargetABI()),
       DefaultSubtarget(TT, CPU.str(), FS.str(), isLittle, *this) {
   initAsmInfo();
@@ -150,7 +151,17 @@ public:
   const Cpu0Subtarget &getCpu0Subtarget() const {
     return *getCpu0TargetMachine().getSubtargetImpl();
   }
+
+  bool addInstSelector() override;
 };
+
+// Install an instruction selector pass using
+// the ISelDag to gen Cpu0 code.
+bool Cpu0PassConfig::addInstSelector() {
+  addPass(createCpu0SEISelDag(getCpu0TargetMachine(), getOptLevel()));
+  return false;
+}
+
 } // namespace
 
 TargetPassConfig *Cpu0TargetMachine::createPassConfig(PassManagerBase &PM) {
