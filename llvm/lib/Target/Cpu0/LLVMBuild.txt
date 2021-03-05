@@ -19,7 +19,6 @@
 
 [common]
 subdirectories = 
-  InstPrinter 
   MCTargetDesc TargetInfo
 
 [component_0]

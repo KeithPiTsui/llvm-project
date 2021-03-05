@@ -14,7 +14,7 @@
 
 #include "Cpu0AsmPrinter.h"
 
-#include "InstPrinter/Cpu0InstPrinter.h"
+#include "MCTargetDesc/Cpu0InstPrinter.h"
 #include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "Cpu0.h"
 #include "Cpu0InstrInfo.h"

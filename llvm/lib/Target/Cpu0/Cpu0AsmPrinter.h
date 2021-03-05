@@ -16,8 +16,8 @@
 
 #include "Cpu0Config.h"
 
-#include "Cpu0MachineFunction.h"
 #include "Cpu0MCInstLower.h"
+#include "Cpu0MachineFunction.h"
 #include "Cpu0Subtarget.h"
 #include "Cpu0TargetMachine.h"
 #include "llvm/CodeGen/AsmPrinter.h"
@@ -37,20 +37,17 @@ class LLVM_LIBRARY_VISIBILITY Cpu0AsmPrinter : public AsmPrinter {
   void emitInstrWithMacroNoAT(const MachineInstr *MI);
 
 private:
-
   // lowerOperand - Convert a MachineOperand into the equivalent MCOperand.
   bool lowerOperand(const MachineOperand &MO, MCOperand &MCOp);
 
 public:
-
   const Cpu0Subtarget *Subtarget;
   const Cpu0FunctionInfo *Cpu0FI;
   Cpu0MCInstLower MCInstLowering;
 
   explicit Cpu0AsmPrinter(TargetMachine &TM,
                           std::unique_ptr<MCStreamer> Streamer)
-    : AsmPrinter(TM, std::move(Streamer)), 
-      MCInstLowering(*this) {
+      : AsmPrinter(TM, std::move(Streamer)), MCInstLowering(*this) {
     Subtarget = static_cast<Cpu0TargetMachine &>(TM).getSubtargetImpl();
   }
 
@@ -60,7 +57,7 @@ public:
 
   virtual bool runOnMachineFunction(MachineFunction &MF) override;
 
-//- EmitInstruction() must exists or will have run time error.
+  //- EmitInstruction() must exists or will have run time error.
   void emitInstruction(const MachineInstr *MI) override;
   void printSavedRegsBitmask(raw_ostream &O);
   void printHex32(unsigned int Value, raw_ostream &O);
@@ -72,7 +69,6 @@ public:
   void emitStartOfAsmFile(Module &M) override;
   void printDebugValueComment(const MachineInstr *MI, raw_ostream &OS);
 };
-}
+} // namespace llvm
 
 #endif
-

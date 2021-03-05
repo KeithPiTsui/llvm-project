@@ -12,7 +12,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "Cpu0MCTargetDesc.h"
-#include "../InstPrinter/Cpu0InstPrinter.h"
+#include "Cpu0InstPrinter.h"
 #include "Cpu0InstrInfo.h"
 #include "Cpu0MCAsmInfo.h"
 #include "llvm/MC/MCDwarf.h"
@@ -88,13 +88,9 @@ static MCAsmInfo *createCpu0MCAsmInfo(const MCRegisterInfo &MRI,
                                       const Triple &TT,
                                       const MCTargetOptions &Options) {
   MCAsmInfo *MAI = new Cpu0MCAsmInfo(TT);
-
   unsigned SP = MRI.getDwarfRegNum(Cpu0::SP, true);
   MCCFIInstruction Inst = MCCFIInstruction::createDefCfaRegister(nullptr, SP);
-
-  // MCCFIInstruction::createDefCfa(nullptr, SP, 0);
   MAI->addInitialFrameState(Inst);
-
   return MAI;
 }
 
@@ -103,9 +99,6 @@ static MCInstPrinter *createCpu0MCInstPrinter(const Triple &T,
                                               const MCAsmInfo &MAI,
                                               const MCInstrInfo &MII,
                                               const MCRegisterInfo &MRI) {
-  // Cpu0InstPrinter(
-  //     const MCAsmInfo &MAI, const MCInstrInfo &MII,
-  //     const MCRegisterInfo &MRI);
   return new Cpu0InstPrinter(MAI, MII, MRI);
 }
 
@@ -126,13 +119,10 @@ extern "C" void LLVMInitializeCpu0TargetMC() {
   for (Target *T : {&TheCpu0Target, &TheCpu0elTarget}) {
     // Register the MC asm info.
     TargetRegistry::RegisterMCAsmInfo(*T, createCpu0MCAsmInfo);
-
     // Register the MC instruction info.
     TargetRegistry::RegisterMCInstrInfo(*T, createCpu0MCInstrInfo);
-
     // Register the MC register info.
     TargetRegistry::RegisterMCRegInfo(*T, createCpu0MCRegisterInfo);
-
     // Register the MC subtarget info.
     TargetRegistry::RegisterMCSubtargetInfo(*T, createCpu0MCSubtargetInfo);
     // Register the MC instruction analyzer.
