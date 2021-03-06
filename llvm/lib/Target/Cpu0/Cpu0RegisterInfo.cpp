@@ -73,9 +73,9 @@ BitVector Cpu0RegisterInfo::getReservedRegs(const MachineFunction &MF) const {
 // FrameIndex represent objects inside a abstract stack.
 // We must replace FrameIndex with an stack/frame pointer
 // direct reference.
-void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
-                                           int SPAdj, unsigned FIOperandNum,
-                                           RegScavenger *RS) const {}
+// void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
+//                                            int SPAdj, unsigned FIOperandNum,
+//                                            RegScavenger *RS) const {}
 //}
 
 bool Cpu0RegisterInfo::requiresRegisterScavenging(
@@ -92,4 +92,79 @@ bool Cpu0RegisterInfo::trackLivenessAfterRegAlloc(
 Register Cpu0RegisterInfo::getFrameRegister(const MachineFunction &MF) const {
   const TargetFrameLowering *TFI = MF.getSubtarget().getFrameLowering();
   return TFI->hasFP(MF) ? (Cpu0::FP) : (Cpu0::SP);
+}
+
+//- If no eliminateFrameIndex(), it will hang on run.
+// pure virtual method
+// FrameIndex represent objects inside a abstract stack.
+// We must replace FrameIndex with an stack/frame pointer
+// direct reference.
+void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
+                                           int SPAdj, unsigned FIOperandNum,
+                                           RegScavenger *RS) const {
+  MachineInstr &MI = *II;
+  MachineFunction &MF = *MI.getParent()->getParent();
+  MachineFrameInfo *MFI = MF.getFrameInfo();
+  Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
+
+  unsigned i = 0;
+  while (!MI.getOperand(i).isFI()) {
+    ++i;
+    assert(i < MI.getNumOperands() && "Instr doesn't have FrameIndex operand!");
+  }
+
+  DEBUG(errs() << "\nFunction : " << MF.getFunction()->getName() << "\n";
+        errs() << "<--------->\n"
+               << MI);
+
+  int FrameIndex = MI.getOperand(i).getIndex();
+  uint64_t stackSize = MF.getFrameInfo()->getStackSize();
+  int64_t spOffset = MF.getFrameInfo()->getObjectOffset(FrameIndex);
+
+  DEBUG(errs() << "FrameIndex : " << FrameIndex << "\n"
+               << "spOffset   : " << spOffset << "\n"
+               << "stackSize  : " << stackSize << "\n");
+
+  const std::vector<CalleeSavedInfo> &CSI = MFI->getCalleeSavedInfo();
+  int MinCSFI = 0;
+  int MaxCSFI = -1;
+
+  if (CSI.size()) {
+    MinCSFI = CSI[0].getFrameIdx();
+    MaxCSFI = CSI[CSI.size() - 1].getFrameIdx();
+  }
+
+  // The following stack frame objects are always referenced relative to $sp:
+  //  1. Outgoing arguments.
+  //  2. Pointer to dynamically allocated stack space.
+  //  3. Locations for callee-saved registers.
+  // Everything else is referenced relative to whatever register
+  // getFrameRegister() returns.
+  unsigned FrameReg;
+
+  FrameReg = Cpu0::SP;
+
+  // Calculate final offset.
+  // - There is no need to change the offset if the frame object is one of the
+  //   following: an outgoing argument, pointer to a dynamically allocated
+  //   stack space or a $gp restore location,
+  // - If the frame object is any of the following, its offset must be adjusted
+  //   by adding the size of the stack:
+  //   incoming argument, callee-saved register location or local variable.
+  int64_t Offset;
+  Offset = spOffset + (int64_t)stackSize;
+
+  Offset += MI.getOperand(i + 1).getImm();
+
+  DEBUG(errs() << "Offset     : " << Offset << "\n"
+               << "<--------->\n");
+
+  // If MI is not a debug value, make sure Offset fits in the 16-bit immediate
+  // field.
+  if (!MI.isDebugValue() && !isInt<16>(Offset)) {
+    assert("(!MI.isDebugValue() && !isInt<16>(Offset))");
+  }
+
+  MI.getOperand(i).ChangeToRegister(FrameReg, false);
+  MI.getOperand(i + 1).ChangeToImmediate(Offset);
 }
