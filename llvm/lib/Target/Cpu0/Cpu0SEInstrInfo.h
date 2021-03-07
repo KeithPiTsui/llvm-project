@@ -32,9 +32,9 @@ public:
   //@expandPostRAPseudo
   bool expandPostRAPseudo(MachineInstr &MI) const override;
 
-  /// Adjust SP by Amount bytes.
+  /// Adjust SP by Amount bytes. FIXME: it is an override method.
   void adjustStackPtr(unsigned SP, int64_t Amount, MachineBasicBlock &MBB,
-                      MachineBasicBlock::iterator I) const override;
+                      MachineBasicBlock::iterator I) const;
 
   /// Emit a series of instructions to load an immediate. If NewImm is a
   /// non-NULL parameter, the last instruction is not emitted, but instead

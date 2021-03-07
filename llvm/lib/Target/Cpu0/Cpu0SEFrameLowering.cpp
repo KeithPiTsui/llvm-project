@@ -24,6 +24,7 @@
 #include "llvm/CodeGen/RegisterScavenging.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/Function.h"
+#include "llvm/MC/MachineLocation.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Target/TargetOptions.h"
 
@@ -36,11 +37,11 @@ Cpu0SEFrameLowering::Cpu0SEFrameLowering(const Cpu0Subtarget &STI)
 void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
                                        MachineBasicBlock &MBB) const {
   assert(&MF.front() == &MBB && "Shrink-wrapping not yet supported");
-  MachineFrameInfo &MFI    = MF.getFrameInfo();
+  MachineFrameInfo &MFI = MF.getFrameInfo();
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   const Cpu0SEInstrInfo &TII =
-    *static_cast<const Cpu0SEInstrInfo*>(STI.getInstrInfo());
+      *static_cast<const Cpu0SEInstrInfo *>(STI.getInstrInfo());
   const Cpu0RegisterInfo &RegInfo =
       *static_cast<const Cpu0RegisterInfo *>(STI.getRegisterInfo());
 
@@ -54,7 +55,8 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
   uint64_t StackSize = MFI.getStackSize();
 
   // No need to allocate space on the stack.
-  if (StackSize == 0 && !MFI.adjustsStack()) return;
+  if (StackSize == 0 && !MFI.adjustsStack())
+    return;
 
   MachineModuleInfo &MMI = MF.getMMI();
   const MCRegisterInfo *MRI = MMI.getContext().getRegisterInfo();
@@ -64,12 +66,12 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
   TII.adjustStackPtr(SP, -StackSize, MBB, MBBI);
 
   // emit ".cfi_def_cfa_offset StackSize"
-  unsigned CFIIndex = MMI.addFrameInst(
-      MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
+  unsigned CFIIndex = 0; // MMI.addFrameInst(
+    //MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
   BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
       .addCFIIndex(CFIIndex);
 
-  const std::vector<CalleeSavedInfo> &CSI = MFI->getCalleeSavedInfo();
+  const std::vector<CalleeSavedInfo> &CSI = MFI.getCalleeSavedInfo();
 
   if (CSI.size()) {
     // Find the instruction past the last instruction that saves a callee-saved
@@ -80,27 +82,27 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
     // Iterate over list of callee-saved registers and emit .cfi_offset
     // directives.
     for (std::vector<CalleeSavedInfo>::const_iterator I = CSI.begin(),
-           E = CSI.end(); I != E; ++I) {
-      int64_t Offset = MFI->getObjectOffset(I->getFrameIdx());
+                                                      E = CSI.end();
+         I != E; ++I) {
+      int64_t Offset = MFI.getObjectOffset(I->getFrameIdx());
       unsigned Reg = I->getReg();
       {
         // Reg is in CPURegs.
-        unsigned CFIIndex = MMI.addFrameInst(MCCFIInstruction::createOffset(
-            nullptr, MRI->getDwarfRegNum(Reg, 1), Offset));
+        unsigned CFIIndex = 0; //  MMI.addFrameInst(MCCFIInstruction::createOffset(
+          //nullptr, MRI->getDwarfRegNum(Reg, 1), Offset));
         BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
             .addCFIIndex(CFIIndex);
       }
     }
   }
-
 }
 //}
 
 //@emitEpilogue {
 void Cpu0SEFrameLowering::emitEpilogue(MachineFunction &MF,
-                                 MachineBasicBlock &MBB) const {
+                                       MachineBasicBlock &MBB) const {
   MachineBasicBlock::iterator MBBI = MBB.getLastNonDebugInstr();
-  MachineFrameInfo &MFI            = MF.getFrameInfo();
+  MachineFrameInfo &MFI = MF.getFrameInfo();
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   const Cpu0SEInstrInfo &TII =
@@ -123,8 +125,8 @@ void Cpu0SEFrameLowering::emitEpilogue(MachineFunction &MF,
 }
 //}
 
-bool
-Cpu0SEFrameLowering::hasReservedCallFrame(const MachineFunction &MF) const {
+bool Cpu0SEFrameLowering::hasReservedCallFrame(
+    const MachineFunction &MF) const {
   const MachineFrameInfo &MFI = MF.getFrameInfo();
 
   // Reserve call frame if the size of the maximum call frame fits into 16-bit
@@ -132,7 +134,7 @@ Cpu0SEFrameLowering::hasReservedCallFrame(const MachineFunction &MF) const {
   // Make sure the second register scavenger spill slot can be accessed with one
   // instruction.
   return isInt<16>(MFI.getMaxCallFrameSize() + getStackAlignment()) &&
-    !MFI.hasVarSizedObjects();
+         !MFI.hasVarSizedObjects();
 }
 
 const Cpu0FrameLowering *
@@ -140,20 +142,19 @@ llvm::createCpu0SEFrameLowering(const Cpu0Subtarget &ST) {
   return new Cpu0SEFrameLowering(ST);
 }
 
-
 // This method is called immediately before PrologEpilogInserter scans the
 //  physical registers used to determine what callee saved registers should be
 //  spilled. This method is optional.
 void Cpu0SEFrameLowering::determineCalleeSaves(MachineFunction &MF,
                                                BitVector &SavedRegs,
                                                RegScavenger *RS) const {
-//@determineCalleeSaves-body
+  //@determineCalleeSaves-body
   TargetFrameLowering::determineCalleeSaves(MF, SavedRegs, RS);
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
-  MachineRegisterInfo& MRI = MF.getRegInfo();
+  MachineRegisterInfo &MRI = MF.getRegInfo();
 
-  if (MF.getFrameInfo()->hasCalls())
-    setAliasRegs(MF, SavedRegs, Cpu0::LR);
+  if (MF.getFrameInfo().hasCalls());
+    //setAliasRegs(MF, SavedRegs, Cpu0::LR);
 
   return;
 }

@@ -104,7 +104,7 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
                                            RegScavenger *RS) const {
   MachineInstr &MI = *II;
   MachineFunction &MF = *MI.getParent()->getParent();
-  MachineFrameInfo *MFI = MF.getFrameInfo();
+  MachineFrameInfo MFI = MF.getFrameInfo();
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
 
   unsigned i = 0;
@@ -113,19 +113,19 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
     assert(i < MI.getNumOperands() && "Instr doesn't have FrameIndex operand!");
   }
 
-  DEBUG(errs() << "\nFunction : " << MF.getFunction()->getName() << "\n";
-        errs() << "<--------->\n"
-               << MI);
+  // DEBUG(errs() << "\nFunction : " << MF.getFunction()->getName() << "\n";
+  //       errs() << "<--------->\n"
+  //              << MI);
 
   int FrameIndex = MI.getOperand(i).getIndex();
-  uint64_t stackSize = MF.getFrameInfo()->getStackSize();
-  int64_t spOffset = MF.getFrameInfo()->getObjectOffset(FrameIndex);
+  uint64_t stackSize = MF.getFrameInfo().getStackSize();
+  int64_t spOffset = MF.getFrameInfo().getObjectOffset(FrameIndex);
 
-  DEBUG(errs() << "FrameIndex : " << FrameIndex << "\n"
-               << "spOffset   : " << spOffset << "\n"
-               << "stackSize  : " << stackSize << "\n");
+  // DEBUG(errs() << "FrameIndex : " << FrameIndex << "\n"
+  //              << "spOffset   : " << spOffset << "\n"
+  //              << "stackSize  : " << stackSize << "\n");
 
-  const std::vector<CalleeSavedInfo> &CSI = MFI->getCalleeSavedInfo();
+  const std::vector<CalleeSavedInfo> &CSI = MFI.getCalleeSavedInfo();
   int MinCSFI = 0;
   int MaxCSFI = -1;
 
@@ -156,8 +156,8 @@ void Cpu0RegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
 
   Offset += MI.getOperand(i + 1).getImm();
 
-  DEBUG(errs() << "Offset     : " << Offset << "\n"
-               << "<--------->\n");
+  // DEBUG(errs() << "Offset     : " << Offset << "\n"
+  //              << "<--------->\n");
 
   // If MI is not a debug value, make sure Offset fits in the 16-bit immediate
   // field.

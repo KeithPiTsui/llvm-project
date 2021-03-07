@@ -32,8 +32,8 @@ namespace llvm {
 class Cpu0FunctionInfo : public MachineFunctionInfo {
 public:
   Cpu0FunctionInfo(MachineFunction &MF)
-      : MF(MF), SRetReturnReg(0), CallsEhReturn(false), CallsEhDwarf(false),
-        VarArgsFrameIndex(0), EmitNOAT(false), MaxCallFrameSize(0) {}
+      : MF(MF), SRetReturnReg(0), VarArgsFrameIndex(0), CallsEhReturn(false),
+        CallsEhDwarf(false), EmitNOAT(false), MaxCallFrameSize(0) {}
   ~Cpu0FunctionInfo();
 
   unsigned getSRetReturnReg() const { return SRetReturnReg; }

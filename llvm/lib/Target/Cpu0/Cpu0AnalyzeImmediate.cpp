@@ -87,8 +87,8 @@ void Cpu0AnalyzeImmediate::GetInstSeqLs(uint64_t Imm, unsigned RemSize,
 void Cpu0AnalyzeImmediate::ReplaceADDiuSHLWithLUi(InstSeq &Seq) {
   // Check if the first two instructions are ADDiu and SHL and the shift amount
   // is at least 16.
-  if ((Seq.size() < 2) || (Seq[0].Opc != ADDiu) ||
-      (Seq[1].Opc != SHL) || (Seq[1].ImmOpnd < 16))
+  if ((Seq.size() < 2) || (Seq[0].Opc != ADDiu) || (Seq[1].Opc != SHL) ||
+      (Seq[1].ImmOpnd < 16))
     return;
 
   // Sign-extend and shift operand of ADDiu and see if it still fits in 16-bit.
@@ -123,9 +123,9 @@ void Cpu0AnalyzeImmediate::GetShortestSeq(InstSeqLs &SeqLs, InstSeq &Insts) {
   Insts.append(ShortestSeq->begin(), ShortestSeq->end());
 }
 
-const Cpu0AnalyzeImmediate::InstSeq
-&Cpu0AnalyzeImmediate::Analyze(uint64_t Imm, unsigned Size,
-                               bool LastInstrIsADDiu) {
+const Cpu0AnalyzeImmediate::InstSeq &
+Cpu0AnalyzeImmediate::Analyze(uint64_t Imm, unsigned Size,
+                              bool LastInstrIsADDiu) {
   this->Size = Size;
 
   ADDiu = Cpu0::ADDiu;

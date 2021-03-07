@@ -38,6 +38,8 @@ add_llvm_target(Cpu0CodeGen
 
   Cpu0ISelDAGToDAG.cpp
   Cpu0SEISelDAGToDAG.cpp
+
+  Cpu0AnalyzeImmediate.cpp
   )
 
 # Should match with "subdirectories =  MCTargetDesc TargetInfo" in LLVMBuild.txt

@@ -22,6 +22,8 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TargetRegistry.h"
 
+#include "Cpu0AnalyzeImmediate.h"
+
 using namespace llvm;
 
 Cpu0SEInstrInfo::Cpu0SEInstrInfo(const Cpu0Subtarget &STI)
