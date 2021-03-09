@@ -14,16 +14,16 @@
 
 #include "Cpu0AsmPrinter.h"
 
-#include "MCTargetDesc/Cpu0InstPrinter.h"
-#include "MCTargetDesc/Cpu0BaseInfo.h"
 #include "Cpu0.h"
 #include "Cpu0InstrInfo.h"
+#include "MCTargetDesc/Cpu0BaseInfo.h"
+#include "MCTargetDesc/Cpu0InstPrinter.h"
 #include "llvm/ADT/SmallString.h"
 #include "llvm/ADT/StringExtras.h"
 #include "llvm/ADT/Twine.h"
 #include "llvm/CodeGen/MachineConstantPool.h"
-#include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
+#include "llvm/CodeGen/MachineFunctionPass.h"
 #include "llvm/CodeGen/MachineInstr.h"
 #include "llvm/CodeGen/MachineMemOperand.h"
 #include "llvm/IR/BasicBlock.h"
@@ -33,8 +33,8 @@
 #include "llvm/MC/MCInst.h"
 #include "llvm/MC/MCStreamer.h"
 #include "llvm/MC/MCSymbol.h"
-#include "llvm/Support/raw_ostream.h"
 #include "llvm/Support/TargetRegistry.h"
+#include "llvm/Support/raw_ostream.h"
 #include "llvm/Target/TargetLoweringObjectFile.h"
 #include "llvm/Target/TargetOptions.h"
 
@@ -51,11 +51,10 @@ bool Cpu0AsmPrinter::runOnMachineFunction(MachineFunction &MF) {
 //@EmitInstruction {
 //- EmitInstruction() must exists or will have run time error.
 void Cpu0AsmPrinter::emitInstruction(const MachineInstr *MI) {
-//@EmitInstruction body {
+  //@EmitInstruction body {
   if (MI->isDebugValue()) {
     SmallString<128> Str;
     raw_svector_ostream OS(Str);
-
     printDebugValueComment(MI, OS);
     return;
   }
@@ -66,10 +65,8 @@ void Cpu0AsmPrinter::emitInstruction(const MachineInstr *MI) {
   MachineBasicBlock::const_instr_iterator E = MI->getParent()->instr_end();
 
   do {
-
     if (I->isPseudo())
       llvm_unreachable("Pseudo opcode found in EmitInstruction()");
-
     MCInst TmpInst0;
     MCInstLowering.Lower(&*I, TmpInst0);
     OutStreamer->emitInstruction(TmpInst0, getSubtargetInfo());
@@ -112,7 +109,7 @@ void Cpu0AsmPrinter::emitInstruction(const MachineInstr *MI) {
 // Mask directives
 //===----------------------------------------------------------------------===//
 //	.frame	$sp,8,$lr
-//->	.mask 	0x00000000,0
+//->	.mask   0x00000000,0
 //	.set	noreorder
 //	.set	nomacro
 
@@ -141,7 +138,8 @@ void Cpu0AsmPrinter::printSavedRegsBitmask(raw_ostream &O) {
   CPUTopSavedRegOff = CPUBitmask ? -CPURegSize : 0;
 
   // Print CPUBitmask
-  O << "\t.mask \t"; printHex32(CPUBitmask, O);
+  O << "\t.mask \t";
+  printHex32(CPUBitmask, O);
   O << ',' << CPUTopSavedRegOff << '\n';
 }
 
@@ -149,37 +147,41 @@ void Cpu0AsmPrinter::printSavedRegsBitmask(raw_ostream &O) {
 void Cpu0AsmPrinter::printHex32(unsigned Value, raw_ostream &O) {
   O << "0x";
   for (int i = 7; i >= 0; i--)
-    O.write_hex((Value & (0xF << (i*4))) >> (i*4));
+    O.write_hex((Value & (0xF << (i * 4))) >> (i * 4));
 }
 
 //===----------------------------------------------------------------------===//
 // Frame and Set directives
 //===----------------------------------------------------------------------===//
 //->	.frame	$sp,8,$lr
-//	.mask 	0x00000000,0
+//	.mask   0x00000000,0
 //	.set	noreorder
 //	.set	nomacro
 /// Frame Directive
 void Cpu0AsmPrinter::emitFrameDirective() {
   const TargetRegisterInfo &RI = *MF->getSubtarget().getRegisterInfo();
 
-  unsigned stackReg  = RI.getFrameRegister(*MF);
+  unsigned stackReg = RI.getFrameRegister(*MF);
   unsigned returnReg = RI.getRARegister();
   unsigned stackSize = MF->getFrameInfo().getStackSize();
 
   if (OutStreamer->hasRawTextSupport())
-    OutStreamer->emitRawText("\t.frame\t$" +
-           StringRef(Cpu0InstPrinter::getRegisterName(stackReg)).lower() +
-           "," + Twine(stackSize) + ",$" +
-           StringRef(Cpu0InstPrinter::getRegisterName(returnReg)).lower());
+    OutStreamer->emitRawText(
+        "\t.frame\t$" +
+        StringRef(Cpu0InstPrinter::getRegisterName(stackReg)).lower() + "," +
+        Twine(stackSize) + ",$" +
+        StringRef(Cpu0InstPrinter::getRegisterName(returnReg)).lower());
 }
 
 /// Emit Set directives.
 const char *Cpu0AsmPrinter::getCurrentABIString() const {
   switch (static_cast<Cpu0TargetMachine &>(TM).getABI().GetEnumValue()) {
-  case Cpu0ABIInfo::ABI::O32:  return "abiO32";
-  case Cpu0ABIInfo::ABI::S32:  return "abiS32";
-  default: llvm_unreachable("Unknown Cpu0 ABI");
+  case Cpu0ABIInfo::ABI::O32:
+    return "abiO32";
+  case Cpu0ABIInfo::ABI::S32:
+    return "abiS32";
+  default:
+    llvm_unreachable("Unknown Cpu0 ABI");
   }
 }
 
@@ -241,7 +243,7 @@ void Cpu0AsmPrinter::emitStartOfAsmFile(Module &M) {
   // Tell the assembler which ABI we are using
   if (OutStreamer->hasRawTextSupport())
     OutStreamer->emitRawText("\t.section .mdebug." +
-                            Twine(getCurrentABIString()));
+                             Twine(getCurrentABIString()));
 
   // return to previous section
   if (OutStreamer->hasRawTextSupport())
@@ -249,7 +251,7 @@ void Cpu0AsmPrinter::emitStartOfAsmFile(Module &M) {
 }
 
 void Cpu0AsmPrinter::printDebugValueComment(const MachineInstr *MI,
-                                           raw_ostream &OS) {
+                                            raw_ostream &OS) {
   // TODO: implement
   OS << "PrintDebugValueComment()";
 }
@@ -259,4 +261,3 @@ extern "C" void LLVMInitializeCpu0AsmPrinter() {
   RegisterAsmPrinter<Cpu0AsmPrinter> X(TheCpu0Target);
   RegisterAsmPrinter<Cpu0AsmPrinter> Y(TheCpu0elTarget);
 }
-

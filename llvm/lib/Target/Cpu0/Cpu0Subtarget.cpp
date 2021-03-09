@@ -1,22 +1,11 @@
 //===-- Cpu0Subtarget.cpp - Cpu0 Subtarget Information --------------------===//
-//
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
-//
-//===----------------------------------------------------------------------===//
-//
 // This file implements the Cpu0 specific subclass of TargetSubtargetInfo.
-//
 //===----------------------------------------------------------------------===//
 
 #include "Cpu0Subtarget.h"
-
 #include "Cpu0.h"
 #include "Cpu0MachineFunction.h"
 #include "Cpu0RegisterInfo.h"
-
 #include "Cpu0TargetMachine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Function.h"
@@ -88,12 +77,10 @@ Cpu0Subtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
     errs() << "-mcpu must be empty(default:cpu032II), cpu032I or cpu032II"
            << "\n";
   }
-
   // Parse features string.
   ParseSubtargetFeatures(CPU, FS);
   // Initialize scheduling itinerary for the specified CPU.
   InstrItins = getInstrItineraryForCPU(CPU);
-
   return *this;
 }
 
@@ -101,5 +88,4 @@ bool Cpu0Subtarget::abiUsesSoftFloat() const {
   //  return TM->Options.UseSoftFloat;
   return true;
 }
-
 const Cpu0ABIInfo &Cpu0Subtarget::getABI() const { return TM.getABI(); }

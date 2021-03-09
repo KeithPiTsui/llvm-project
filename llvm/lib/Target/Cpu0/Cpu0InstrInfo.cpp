@@ -39,16 +39,12 @@ const Cpu0InstrInfo *Cpu0InstrInfo::create(Cpu0Subtarget &STI) {
 /// Return the number of bytes of code the specified instruction may be.
 unsigned Cpu0InstrInfo::GetInstSizeInBytes(const MachineInstr &MI) const {
   //@GetInstSizeInBytes - body
-  switch (MI.getOpcode()) {
-  default:
-    return MI.getDesc().getSize();
-  }
+  return MI.getDesc().getSize();
 }
 
 MachineMemOperand *
 Cpu0InstrInfo::GetMemOperand(MachineBasicBlock &MBB, int FI,
                              MachineMemOperand::Flags Flags) const {
-
   MachineFunction &MF = *MBB.getParent();
   MachineFrameInfo &MFI = MF.getFrameInfo();
   unsigned align = MFI.getObjectAlignment(FI);

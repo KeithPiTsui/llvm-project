@@ -23,22 +23,11 @@
 #include "llvm/Support/raw_ostream.h"
 #include <utility>
 using namespace llvm;
-
 #define DEBUG_TYPE "asm-printer"
-
 #define PRINT_ALIAS_INSTR
 #include "Cpu0GenAsmWriter.inc"
 
 void Cpu0InstPrinter::printRegName(raw_ostream &OS, unsigned RegNo) const {
-  //- getRegisterName(RegNo) defined in Cpu0GenAsmWriter.inc indicated in
-  //   Cpu0.td.
-  // RegNo: from Cpu0GenRegisterInfo.inc, such as:
-  //  FP = 3,
-  //  ...
-  //  SP = 9,
-  // LLVM auto assign RegNo based on Cpu0RegisterInfo.td
-  //  def FP   : Cpu0GPRReg<12, "fp">,   DwarfRegNum<[12]>;
-  //  def SP   : Cpu0GPRReg<13, "sp">,   DwarfRegNum<[13]>;
   OS << '$' << StringRef(getRegisterName(RegNo)).lower();
 }
 

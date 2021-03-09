@@ -12,7 +12,6 @@
 //===----------------------------------------------------------------------===//
 
 #include "Cpu0SEFrameLowering.h"
-
 #include "Cpu0MachineFunction.h"
 #include "Cpu0SEInstrInfo.h"
 #include "Cpu0Subtarget.h"
@@ -65,9 +64,10 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
   // Adjust stack.
   TII.adjustStackPtr(SP, -StackSize, MBB, MBBI);
 
-  // emit ".cfi_def_cfa_offset StackSize"
-  unsigned CFIIndex = 0; // MMI.addFrameInst(
-    //MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
+  // emit ".cfi_def_cfa_offset StackSize"  //FIXME:
+  unsigned CFIIndex =
+      0; // MMI.addFrameInst(
+         // MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
   BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
       .addCFIIndex(CFIIndex);
 
@@ -88,8 +88,9 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
       unsigned Reg = I->getReg();
       {
         // Reg is in CPURegs.
-        unsigned CFIIndex = 0; //  MMI.addFrameInst(MCCFIInstruction::createOffset(
-          //nullptr, MRI->getDwarfRegNum(Reg, 1), Offset));
+        unsigned CFIIndex =
+            0; //  MMI.addFrameInst(MCCFIInstruction::createOffset(
+               // nullptr, MRI->getDwarfRegNum(Reg, 1), Offset));// FIXME
         BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
             .addCFIIndex(CFIIndex);
       }
@@ -152,9 +153,8 @@ void Cpu0SEFrameLowering::determineCalleeSaves(MachineFunction &MF,
   TargetFrameLowering::determineCalleeSaves(MF, SavedRegs, RS);
   Cpu0FunctionInfo *Cpu0FI = MF.getInfo<Cpu0FunctionInfo>();
   MachineRegisterInfo &MRI = MF.getRegInfo();
-
-  if (MF.getFrameInfo().hasCalls());
-    //setAliasRegs(MF, SavedRegs, Cpu0::LR);
-
+  if (MF.getFrameInfo().hasCalls())
+    ;
+  // setAliasRegs(MF, SavedRegs, Cpu0::LR); // FIXME
   return;
 }

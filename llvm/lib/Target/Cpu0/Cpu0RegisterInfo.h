@@ -15,7 +15,6 @@
 #define LLVM_LIB_TARGET_CPU0_CPU0REGISTERINFO_H
 
 #include "Cpu0Config.h"
-
 #include "Cpu0.h"
 #include "llvm/CodeGen/Register.h"
 #include "llvm/CodeGen/TargetRegisterInfo.h"
