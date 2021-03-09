@@ -23,9 +23,11 @@
 #include "llvm/CodeGen/RegisterScavenging.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/Function.h"
+#include "llvm/MC/MCDwarf.h"
 #include "llvm/MC/MachineLocation.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Target/TargetOptions.h"
+#include <cstddef>
 
 using namespace llvm;
 
@@ -65,9 +67,8 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
   TII.adjustStackPtr(SP, -StackSize, MBB, MBBI);
 
   // emit ".cfi_def_cfa_offset StackSize"  //FIXME:
-  unsigned CFIIndex =
-      0; // MMI.addFrameInst(
-         // MCCFIInstruction::createDefCfaOffset(nullptr, -StackSize));
+  unsigned CFIIndex = MF.addFrameInst(
+      MCCFIInstruction::createAdjustCfaOffset(nullptr, -StackSize));
   BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
       .addCFIIndex(CFIIndex);
 
@@ -88,9 +89,8 @@ void Cpu0SEFrameLowering::emitPrologue(MachineFunction &MF,
       unsigned Reg = I->getReg();
       {
         // Reg is in CPURegs.
-        unsigned CFIIndex =
-            0; //  MMI.addFrameInst(MCCFIInstruction::createOffset(
-               // nullptr, MRI->getDwarfRegNum(Reg, 1), Offset));// FIXME
+        unsigned CFIIndex = MF.addFrameInst(MCCFIInstruction::createOffset(
+            nullptr, MRI->getDwarfRegNum(Reg, 1), Offset)); // FIXME
         BuildMI(MBB, MBBI, dl, TII.get(TargetOpcode::CFI_INSTRUCTION))
             .addCFIIndex(CFIIndex);
       }
