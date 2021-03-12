@@ -113,15 +113,8 @@ std::string llvm::createGraphFilename(const Twine &Name, int &FD) {
   // Replace illegal characters in graph Filename with '_' if needed
   std::string CleansedName = replaceIllegalFilenameChars(N, '_');
 
-  // std::error_code EC =
-  //     sys::fs::createTemporaryFile(CleansedName, "dot", FD, Filename);
   std::error_code EC =
       sys::fs::createLocalFile(CleansedName, "dot", FD, Filename);
-
-  // std::error_code createUniqueFile(const Twine &Model, int &ResultFd,
-  //                                  SmallVectorImpl<char> &ResultPath,
-  //                                  unsigned Mode)
-  //   std::error_code EC =  sys::fs::createUniqueFile(
 
   if (EC) {
     errs() << "Error: " << EC.message() << "\n";
@@ -197,7 +190,7 @@ bool llvm::DisplayGraph(StringRef FilenameRef, bool wait,
 
 #ifdef __APPLE__
   wait &= !ViewBackground;
-  if (S.TryFindProgram("open", ViewerPath)) {
+  if (S.TryFindProgram("dotPNG", ViewerPath)) {
     std::vector<StringRef> args;
     args.push_back(ViewerPath);
     if (wait)
