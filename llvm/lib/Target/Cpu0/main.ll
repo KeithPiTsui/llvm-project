@@ -1,5 +1,5 @@
-define i32 @main() nounwind uwtable {
-%1 = alloca i32, align 4
-store i32 0, i32* %1
-ret i32 0
+define i32 @main() {
+%1 = add i32 0, 1
+%2 = add i32 %1, 2
+ret i32 %2
 }

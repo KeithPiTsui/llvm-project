@@ -801,7 +801,7 @@ enum OpenFlags : unsigned {
 /// @param ResultPath Set to the file's path.
 /// @param MakeAbsolute Whether to use the system temp directory.
 void createUniquePath(const Twine &Model, SmallVectorImpl<char> &ResultPath,
-                      bool MakeAbsolute);
+                      bool MakeAbsolute, bool inTempDir = true);
 
 /// Create a uniquely named file.
 ///
@@ -883,10 +883,16 @@ public:
 std::error_code createTemporaryFile(const Twine &Prefix, StringRef Suffix,
                                     int &ResultFD,
                                     SmallVectorImpl<char> &ResultPath);
+std::error_code createLocalFile(const Twine &Prefix, StringRef Suffix,
+                                    int &ResultFD,
+                                    SmallVectorImpl<char> &ResultPath);
 
 /// Simpler version for clients that don't want an open file. An empty
 /// file will still be created.
 std::error_code createTemporaryFile(const Twine &Prefix, StringRef Suffix,
+                                    SmallVectorImpl<char> &ResultPath);
+
+std::error_code createLocalFile(const Twine &Prefix, StringRef Suffix,
                                     SmallVectorImpl<char> &ResultPath);
 
 std::error_code createUniqueDirectory(const Twine &Prefix,
