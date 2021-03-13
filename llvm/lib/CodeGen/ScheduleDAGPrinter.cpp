@@ -93,5 +93,5 @@ void ScheduleDAG::viewGraph(const Twine &Name, const Twine &Title) {
 
 /// Out-of-line implementation with no arguments is handy for gdb.
 void ScheduleDAG::viewGraph() {
-  viewGraph(getDAGName(), "Scheduling-Units Graph for " + getDAGName());
+  viewGraph(getDAGName()+"SchedUnits-", "Scheduling-Units Graph for " + getDAGName());
 }

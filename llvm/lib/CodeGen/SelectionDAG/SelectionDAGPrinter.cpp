@@ -147,10 +147,10 @@ std::string DOTGraphTraits<SelectionDAG*>::getNodeLabel(const SDNode *Node,
 /// viewGraph - Pop up a ghostview window with the reachable parts of the DAG
 /// rendered using 'dot'.
 ///
-void SelectionDAG::viewGraph(const std::string &Title) {
+void SelectionDAG::viewGraph(const std::string &Title, const std::string keyword) {
 // This code is only for debugging!
 #ifndef NDEBUG
-  ViewGraph(this, "dag." + getMachineFunction().getName(),
+  ViewGraph(this, "dag." + keyword + "-" + getMachineFunction().getName(),
             false, Title);
 #else
   errs() << "SelectionDAG::viewGraph is only available in debug builds on "
