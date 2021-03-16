@@ -31,6 +31,80 @@ Cpu0SEInstrInfo::Cpu0SEInstrInfo(const Cpu0Subtarget &STI)
 
 const Cpu0RegisterInfo &Cpu0SEInstrInfo::getRegisterInfo() const { return RI; }
 
+void Cpu0SEInstrInfo::copyPhysReg(MachineBasicBlock &MBB,
+                                  MachineBasicBlock::iterator MI,
+                                  const DebugLoc &DL, MCRegister DestReg,
+                                  MCRegister SrcReg, bool KillSrc) const {
+  unsigned Opc = 0, ZeroReg = 0;
+
+  if (Cpu0::CPURegsRegClass.contains(DestReg)) { // Copy to CPU Reg.
+    if (Cpu0::CPURegsRegClass.contains(SrcReg))
+      Opc = Cpu0::ADDu, ZeroReg = Cpu0::ZERO;
+    else if (SrcReg == Cpu0::HI)
+      Opc = Cpu0::MFHI, SrcReg = 0;
+    else if (SrcReg == Cpu0::LO)
+      Opc = Cpu0::MFLO, SrcReg = 0;
+  } else if (Cpu0::CPURegsRegClass.contains(SrcReg)) { // Copy from CPU Reg.
+    if (DestReg == Cpu0::HI)
+      Opc = Cpu0::MTHI, DestReg = 0;
+    else if (DestReg == Cpu0::LO)
+      Opc = Cpu0::MTLO, DestReg = 0;
+  }
+
+  assert(Opc && "Cannot copy registers");
+
+  MachineInstrBuilder MIB = BuildMI(MBB, MI, DL, get(Opc));
+
+  if (DestReg)
+    MIB.addReg(DestReg, RegState::Define);
+
+  if (ZeroReg)
+    MIB.addReg(ZeroReg);
+
+  if (SrcReg)
+    MIB.addReg(SrcReg, getKillRegState(KillSrc));
+}
+
+// void Cpu0SEInstrInfo::storeRegToStack(MachineBasicBlock &MBB,
+//                                       MachineBasicBlock::iterator I,
+//                                       unsigned SrcReg, bool isKill, int FI,
+//                                       const TargetRegisterClass *RC,
+//                                       const TargetRegisterInfo *TRI,
+//                                       int64_t Offset) const {
+//   DebugLoc DL;
+//   MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOStore);
+
+//   unsigned Opc = 0;
+
+//   Opc = Cpu0::ST;
+//   assert(Opc && "Register class not handled!");
+//   BuildMI(MBB, I, DL, get(Opc))
+//       .addReg(SrcReg, getKillRegState(isKill))
+//       .addFrameIndex(FI)
+//       .addImm(Offset)
+//       .addMemOperand(MMO);
+// }
+
+// void Cpu0SEInstrInfo::loadRegFromStack(MachineBasicBlock &MBB,
+//                                        MachineBasicBlock::iterator I,
+//                                        unsigned DestReg, int FI,
+//                                        const TargetRegisterClass *RC,
+//                                        const TargetRegisterInfo *TRI,
+//                                        int64_t Offset) const {
+//   DebugLoc DL;
+//   if (I != MBB.end())
+//     DL = I->getDebugLoc();
+//   MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOLoad);
+//   unsigned Opc = 0;
+
+//   Opc = Cpu0::LD;
+//   assert(Opc && "Register class not handled!");
+//   BuildMI(MBB, I, DL, get(Opc), DestReg)
+//       .addFrameIndex(FI)
+//       .addImm(Offset)
+//       .addMemOperand(MMO);
+// }
+
 //@expandPostRAPseudo
 /// Expand Pseudo instructions into real backend instructions
 bool Cpu0SEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {

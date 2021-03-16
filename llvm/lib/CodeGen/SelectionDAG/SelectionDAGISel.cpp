@@ -807,8 +807,7 @@ void SelectionDAGISel::CodeGenAndEmitDAG() {
   // Second step, hack on the DAG until it only uses operations and types that
   // the target supports.
   if (ViewLegalizeTypesDAGs && MatchFilterBB)
-    CurDAG->viewGraph("legalize-types input for " + BlockName,
-                      "LegalizeTypes");
+    CurDAG->viewGraph("legalize-types input for " + BlockName, "LegalizeTypes");
 
   bool Changed;
   {
@@ -832,8 +831,7 @@ void SelectionDAGISel::CodeGenAndEmitDAG() {
 
   if (Changed) {
     if (ViewDAGCombineLT && MatchFilterBB)
-      CurDAG->viewGraph("dag-combine-lt input for " + BlockName,
-                        "CombineLT");
+      CurDAG->viewGraph("dag-combine-lt input for " + BlockName, "CombineLT");
 
     // Run the DAG combiner in post-type-legalize mode.
     {
@@ -877,8 +875,7 @@ void SelectionDAGISel::CodeGenAndEmitDAG() {
                CurDAG->dump());
 
     if (ViewDAGCombineLT && MatchFilterBB)
-      CurDAG->viewGraph("dag-combine-lv input for " + BlockName,
-                        "CombineLT");
+      CurDAG->viewGraph("dag-combine-lv input for " + BlockName, "CombineLT");
 
     // Run the DAG combiner in post-type-legalize mode.
     {

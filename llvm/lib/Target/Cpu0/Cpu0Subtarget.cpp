@@ -23,6 +23,11 @@ using namespace llvm;
 
 extern bool FixGlobalBaseReg;
 
+static cl::opt<bool>
+    EnableOverflowOpt("cpu0-enable-overflow", cl::Hidden, cl::init(false),
+                      cl::desc("Use trigger overflow instructions add and sub \
+                 instead of non-overflow instructions addu and subu"));
+
 void Cpu0Subtarget::anchor() {}
 
 //@1 {
@@ -30,14 +35,14 @@ Cpu0Subtarget::Cpu0Subtarget(const Triple &TT, const std::string &CPU,
                              const std::string &FS, bool little,
                              const Cpu0TargetMachine &_TM)
     : //@1 }
-      // Cpu0GenSubtargetInfo will display features by llc -march=cpu0
-      // -mcpu=help
       Cpu0GenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
       TargetTriple(TT), TSInfo(),
       InstrInfo(
           Cpu0InstrInfo::create(initializeSubtargetDependencies(CPU, FS, TM))),
       FrameLowering(Cpu0FrameLowering::create(*this)),
-      TLInfo(Cpu0TargetLowering::create(TM, *this)) {}
+      TLInfo(Cpu0TargetLowering::create(TM, *this)) {
+  EnableOverflow = EnableOverflowOpt;
+}
 
 bool Cpu0Subtarget::isPositionIndependent() const {
   return TM.isPositionIndependent();

@@ -165,7 +165,11 @@ private:
                       const SmallVectorImpl<ISD::OutputArg> &Outs,
                       const SmallVectorImpl<SDValue> &OutVals, const SDLoc &dl,
                       SelectionDAG &DAG) const override;
+
+  SDValue PerformDAGCombine(SDNode *N, DAGCombinerInfo &DCI) const override;
 };
+
+
 const Cpu0TargetLowering *
 createCpu0SETargetLowering(const Cpu0TargetMachine &TM,
                            const Cpu0Subtarget &STI);
