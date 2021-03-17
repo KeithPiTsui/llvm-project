@@ -75,10 +75,6 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   // It will emit .align 2 later
   setMinFunctionAlignment(Align(2));
 
-  // must, computeRegisterProperties - Once all of the register classes are
-  //  added, this allows us to compute derived properties we expose.
-  // computeRegisterProperties(STI.getRegisterInfo());
-
   setOperationAction(ISD::SDIV, MVT::i32, Expand);
   setOperationAction(ISD::SREM, MVT::i32, Expand);
   setOperationAction(ISD::UDIV, MVT::i32, Expand);
@@ -95,32 +91,11 @@ Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
   setOperationAction(ISD::SIGN_EXTEND_INREG, MVT::Other, Expand);
 }
 
-// Cpu0TargetLowering::Cpu0TargetLowering(Cpu0TargetMachine &TM)
-//     : TargetLowering(TM, new Cpu0TargetObjectFile()),
-//       Subtarget(&TM.getSubtarget<Cpu0Subtarget>()) {
-
-//   //- Set .align 2
-//   // It will emit .align 2 later
-//   setMinFunctionAlignment(2);
-
-//   // must, computeRegisterProperties - Once all of the register classes are
-//   //  added, this allows us to compute derived properties we expose.
-//   computeRegisterProperties();
-// }
-
 const Cpu0TargetLowering *
 Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
                            const Cpu0Subtarget &STI) {
   return llvm::createCpu0SETargetLowering(TM, STI);
 }
-
-//===----------------------------------------------------------------------===//
-//  Lower helper functions
-//===----------------------------------------------------------------------===//
-
-//===----------------------------------------------------------------------===//
-//  Misc Lower Operation implementation
-//===----------------------------------------------------------------------===//
 
 #include "Cpu0GenCallingConv.inc"
 

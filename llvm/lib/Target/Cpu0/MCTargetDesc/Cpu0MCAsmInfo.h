@@ -19,15 +19,15 @@
 #include "llvm/MC/MCAsmInfoELF.h"
 
 namespace llvm {
-  class Triple;
+class Triple;
 
-  class Cpu0MCAsmInfo : public MCAsmInfoELF {
-    void anchor() override;
-  public:
-    explicit Cpu0MCAsmInfo(const Triple &TheTriple);
-  };
+class Cpu0MCAsmInfo : public MCAsmInfoELF {
+  void anchor() override;
+
+public:
+  explicit Cpu0MCAsmInfo(const Triple &TheTriple);
+};
 
 } // namespace llvm
 
 #endif
-
