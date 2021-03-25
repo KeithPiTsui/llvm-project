@@ -321,6 +321,7 @@ set(LLVM_ALL_TARGETS
   XCore
   Cpu0
   NT
+  LCC
   )
 
 # List of targets with JIT support:

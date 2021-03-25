@@ -1,0 +1,20 @@
+;===- ./lib/Target/NT/LLVMBuild.txt --------------------------*- Conf -*--===;
+[common]
+subdirectories = 
+  MCTargetDesc TargetInfo
+[component_0]
+type = TargetGroup
+name = LCC
+parent = Target
+[component_1]
+type = Library
+name = LCCCodeGen
+parent = LCC
+required_libraries =
+                     CodeGen Core MC 
+                     LCCDesc 
+                     LCCInfo 
+                     SelectionDAG 
+                     Support 
+                     Target
+add_to_library_groups = LCC

@@ -1,0 +1,9 @@
+;===- ./lib/Target/NT/MCTargetDesc/LLVMBuild.txt -------------*- Conf -*--===;
+[component_0]
+type = Library
+name = LCCDesc
+parent = LCC
+required_libraries = MC 
+                     LCCInfo 
+                     Support
+add_to_library_groups = LCC

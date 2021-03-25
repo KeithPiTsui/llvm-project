@@ -17,6 +17,7 @@
 #undef mips
 #undef cpu0
 #undef NT
+#undef LCC
 #undef sparc
 
 namespace llvm {
@@ -103,6 +104,7 @@ public:
     cpu0,           // Cpu0 for tutorial backend Cpu0
     cpu0el,         // Cpu0 for tutorial backend Cpu0
     NT,             // NT for minimal backend registration
+    LCC,
     LastArchType = ve
   };
   enum SubArchType {

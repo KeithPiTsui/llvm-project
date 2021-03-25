@@ -1,0 +1,7 @@
+;===- ./lib/Target/NT/TargetInfo/LLVMBuild.txt ---------------*- Conf -*--===;
+[component_0]
+type = Library
+name = LCCInfo
+parent = LCC
+required_libraries = Support
+add_to_library_groups = LCC

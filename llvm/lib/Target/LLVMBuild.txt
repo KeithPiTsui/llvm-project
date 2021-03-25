@@ -39,6 +39,7 @@ subdirectories =
  XCore
  Cpu0
  NT
+ LCC
 
 ; This is a special group whose required libraries are extended (by llvm-build)
 ; with the best execution engine (the native JIT, if available, or the
