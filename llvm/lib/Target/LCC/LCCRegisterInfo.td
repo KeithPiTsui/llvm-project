@@ -33,8 +33,6 @@ let Namespace = "LCC" in {
 //===----------------------------------------------------------------------===//
 //@Register Classes
 //===----------------------------------------------------------------------===//
-def LCCReservedRegs: RegisterClass<"LCC", [i16], 16, ()>;
-
 def LCCRetValRegs: RegisterClass<"LCC", [i16], 16, (add
   R0)>;
 
@@ -46,10 +44,8 @@ def LCCCalleeSavedRegs: RegisterClass<"LCC", [i16], 16, ()>;
 
 def LCCReserved2Regs: RegisterClass<"LCC", [i16], 16, (add
   FP, SP, LR)>;
-  
+
 def CPURegs : RegisterClass<"LCC", [i16], 16, (add
-  // Reserved
-  LCCReservedRegs,
   // Return Values and Arguments
   LCCRetValRegs, LCCArgRegs,
   // Not preserved across procedure calls
@@ -59,3 +55,5 @@ def CPURegs : RegisterClass<"LCC", [i16], 16, (add
   // Reserved
   LCCReserved2Regs
 )>;
+
+def GPROut : RegisterClass<"LCC", [i16], 16, (add R0, R1, R2, R3, R4)>;

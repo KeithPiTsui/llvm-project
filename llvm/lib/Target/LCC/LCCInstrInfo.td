@@ -6,22 +6,70 @@
 //===----------------------------------------------------------------------===//
 include "LCCInstrFormats.td"
 
-//===----------------------------------------------------------------------===//
-// LCC Operand, Complex Patterns and Transformations Definitions.
-//===----------------------------------------------------------------------===//
-// Instruction operand types
+// Arithmetic and logical instructions with 2 register operands.
+class ArithLogic2Regs<bits<8> op,
+                     string instr_asm,
+                     SDNode OpNode,
+                     Operand Od,
+                     PatLeaf imm_type,
+                     RegisterClass RC> :
+  FB<op,
+  (outs GPROut:$ra),
+  (ins RC:$rb, Od:$imm5),
+  !strconcat(instr_asm, "\t$ra, $rb, $imm5"),
+  [(set GPROut:$ra, (OpNode RC:$rb, imm_type:$imm5))],
+  IIAlu> {
+  let isReMaterializable = 1;
+}
+
+// Arithmetic and logical instructions with 3 register operands.
+class ArithLogic3Regs<bits<8> op, string instr_asm, SDNode OpNode,
+                  InstrItinClass itin, RegisterClass RC, bit isComm = 0>:
+  FA<op, (outs GPROut:$ra), (ins RC:$rb, RC:$rc),
+     !strconcat(instr_asm, "\t$ra, $rb, $rc"),
+     [(set GPROut:$ra, (OpNode RC:$rb, RC:$rc))], itin> {
+  let isCommutable = isComm;	// e.g. add rb rc =  add rc rb
+  let isReMaterializable = 1;
+}
+
+
 // Signed Operand
 def simm16      : Operand<i16> {
+// LLVM supply the “let DecoderMethod” keyword to allow programmers implement 
+// their decode function.
+// LLVM will call these DecodeMethod when user uses Disassembler tools, such as
+// llvm-objdump -d.
   let DecoderMethod= "DecodeSimm16";
 }
-def shamt       : Operand<i16>;
-// Unsigned Operand
-def uimm16      : Operand<i16> {
-  let PrintMethod = "printUnsignedImm";
+
+class ImmSEPL<int size>: PatLeaf<(imm), [{ return isInt<size>(N->getSExtValue()); }]>;
+def imm5PL: ImmSEPL<5>;
+def imm9PL: ImmSEPL<9>;
+
+def ADDi: ArithLogic2Regs<0x01, "add", add, simm16, imm5PL, CPURegs>;
+def ADD: ArithLogic3Regs<0x01, "add", add, IIAlu, CPURegs, 1>;
+
+def ANDi: ArithLogic2Regs<0x01, "and", and, simm16, imm5PL, CPURegs>;
+def AND: ArithLogic3Regs<0x01, "and", and, IIAlu, CPURegs, 1>;
+
+def CMPi: ArithLogic2Regs<0x01, "cmp", cmp, simm16, imm5PL, CPURegs>;
+def CMP: ArithLogic3Regs<0x01, "cmp", cmp, IIAlu, CPURegs, 1>;
+
+def SUBi: ArithLogic2Regs<0x01, "sub", sub, simm16, imm5PL, CPURegs>;
+def SUB: ArithLogic3Regs<0x01, "sub", sub, IIAlu, CPURegs, 1>;
+
+
+//===----------------------------------------------------------------------===//
+// Instruction aliases
+//===----------------------------------------------------------------------===//
+def : LCCInstAlias<"mov $dst, $src",
+                    (ADDi GPROut:$dst, GPROut:$src,ZERO), 1>;
 }
+
+
 // Address operand
 def mem : Operand<iPTR> {
-// Making llvm call function LCCInstPrinter::printMemOperand()
+// Making llvm call function Cpu0InstPrinter::printMemOperand()
   let PrintMethod = "printMemOperand";
 // For example, ld $2, 4($sp), the mem operand is 4($sp):(ops CPURegs, simm16). 
   let MIOperandInfo = (ops CPURegs, simm16);
@@ -29,42 +77,10 @@ def mem : Operand<iPTR> {
 // issued in elf obj since these two instructions use mem Operand.
   let EncoderMethod = "getMemEncoding";
 }
-// Transformation Function - get the lower 16 bits.
-def LO16 : SDNodeXForm<imm, [{
-  // N is SDNode, getZExtValue() is N's member function
-  return getImm(N, N->getZExtValue() & 0xffff);
-}]>;
-// Transformation Function - get the higher 16 bits.
-def HI16 : SDNodeXForm<imm, [{
-  return getImm(N, (N->getZExtValue() >> 16) & 0xffff);
-}]>;
-// Node immediate fits as 16-bit sign extended on target immediate.
-// e.g. addi, andi
-def immSExt16  : PatLeaf<(imm), [{ return isInt<16>(N->getSExtValue()); }]>;
-// Node immediate fits as 16-bit zero extended on target immediate.
-// The LO16 param means that only the lower 16 bits of the node
-// immediate are caught.
-// e.g. addiu, sltiu
-def immZExt16  : PatLeaf<(imm), [{
-  if (N->getValueType(0) == MVT::i16)
-    return (uint16_t)N->getZExtValue() == (unsigned short)N->getZExtValue();
-  else
-    return (uint64_t)N->getZExtValue() == (unsigned short)N->getZExtValue();
-}], LO16>;
-
-// Immediate can be loaded with LUi (16-bit int with lower 16-bit cleared).
-def immLow16Zero : PatLeaf<(imm), [{
-  int64_t Val = N->getSExtValue();
-  return isInt<16>(Val) && !(Val & 0xffff);
-}]>;
-
-// shamt field must fit in 5 bits.
-def immZExt5 : ImmLeaf<i16, [{return Imm == (Imm & 0x1f);}]>;
-
 // As TableGen is unable to generate selection code for complex addressing modes,
 // selection of a MEMbol operand must be done manually. 
 // Reference https://opus4.kobv.de/opus4-fau/files/1108/tricore_llvm.pdf
-// LCC Address Mode! SDNode frameindex could possibily be a match
+// Cpu0 Address Mode! SDNode frameindex could possibily be a match
 // since load and store instructions from stack used it.
 def addr : 
   ComplexPattern<iPTR, 2, "SelectAddr", [frameindex], [SDNPWantParent]>;
@@ -72,84 +88,31 @@ def addr :
 //===----------------------------------------------------------------------===//
 // Pattern fragment for load/store
 //===----------------------------------------------------------------------===//
-
 class AlignedLoad<PatFrag Node> :
   PatFrag<(ops node:$ptr), (Node node:$ptr), [{
   LoadSDNode *LD = cast<LoadSDNode>(N);
-  return LD->getMemoryVT().getSizeInBits()/8 <= LD->getAlignment();
+  return LD->getMemoryVT().getSizeInBits()/16 <= LD->getAlignment();
 }]>;
+
 class AlignedStore<PatFrag Node> :
   PatFrag<(ops node:$val, node:$ptr), (Node node:$val, node:$ptr), [{
   StoreSDNode *SD = cast<StoreSDNode>(N);
-  return SD->getMemoryVT().getSizeInBits()/8 <= SD->getAlignment();
+  return SD->getMemoryVT().getSizeInBits()/16 <= SD->getAlignment();
 }]>;
+
 // Load/Store PatFrags.
 def load_a          : AlignedLoad<load>;
 def store_a         : AlignedStore<store>;
 
-//===----------------------------------------------------------------------===//
-// Instructions specific format
-//===----------------------------------------------------------------------===//
-let Predicates = [Ch3_5] in {
-// Arithmetic and logical instructions with 3 register operands.
-class ArithLogicR<bits<8> op, string instr_asm, SDNode OpNode,
-                  InstrItinClass itin, RegisterClass RC, bit isComm = 0>:
-  FA<op, (outs GPROut:$ra), (ins RC:$rb, RC:$rc),
-     !strconcat(instr_asm, "\t$ra, $rb, $rc"),
-     [(set GPROut:$ra, (OpNode RC:$rb, RC:$rc))], itin> {
-  let shamt = 0;
-  let isCommutable = isComm;	// e.g. add rb rc =  add rc rb
-  let isReMaterializable = 1;
-}
-}
-
-// Arithmetic and logical instructions with 2 register operands.
-class ArithLogicI<bits<8> op, string instr_asm, SDNode OpNode,
-                  Operand Od, PatLeaf imm_type, RegisterClass RC> :
-  FL<op, (outs GPROut:$ra), (ins RC:$rb, Od:$imm16),
-     !strconcat(instr_asm, "\t$ra, $rb, $imm16"),
-     [(set GPROut:$ra, (OpNode RC:$rb, imm_type:$imm16))], IIAlu> {
-  let isReMaterializable = 1;
-}
-
-let Predicates = [Ch3_5] in {
-// Shifts
-class shift_rotate_imm<bits<8> op, bits<4> isRotate, string instr_asm,
-                       SDNode OpNode, PatFrag PF, Operand ImmOpnd,
-                       RegisterClass RC>:
-  FA<op, (outs GPROut:$ra), (ins RC:$rb, ImmOpnd:$shamt),
-     !strconcat(instr_asm, "\t$ra, $rb, $shamt"),
-     [(set GPROut:$ra, (OpNode RC:$rb, PF:$shamt))], IIAlu> {
-  let rc = 0;
-}
-
-// 16-bit shift instructions.
-class shift_rotate_imm16<bits<8> op, bits<4> isRotate, string instr_asm,
-                         SDNode OpNode>:
-  shift_rotate_imm<op, isRotate, instr_asm, OpNode, immZExt5, shamt, CPURegs>;
-}
-
-let Predicates = [Ch3_5] in {
-// Load Upper Imediate
-class LoadUpper<bits<8> op, string instr_asm, RegisterClass RC, Operand Imm>:
-  FL<op, (outs RC:$ra), (ins Imm:$imm16),
-     !strconcat(instr_asm, "\t$ra, $imm16"), [], IIAlu> {
-  let rb = 0;
-  let isReMaterializable = 1;
-}
-}
-
-class FMem<bits<8> op, dag outs, dag ins, string asmstr, list<dag> pattern,
-          InstrItinClass itin>: FL<op, outs, ins, asmstr, pattern, itin> {
-  bits<20> addr;
-  let Inst{19-16} = addr{19-16};
-  let Inst{15-0}  = addr{15-0};
+class FMem<bits<4> op, dag outs, dag ins, string asmstr, list<dag> pattern,
+          InstrItinClass itin>: FC<op, outs, ins, asmstr, pattern, itin> {
+  bits<9> addr;
+  let imm9 = addr;
   let DecoderMethod = "DecodeMem";
 }
 
-// Memory Load/Store
 let canFoldAsLoad = 1 in
-class LoadM<bits<8> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
+class LoadM<bits<4> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
             Operand MemOpnd, bit Pseudo>:
   FMem<op, (outs RC:$ra), (ins MemOpnd:$addr),
      !strconcat(instr_asm, "\t$ra, $addr"),
@@ -157,7 +120,7 @@ class LoadM<bits<8> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
   let isPseudo = Pseudo;
 }
 
-class StoreM<bits<8> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
+class StoreM<bits<4> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
              Operand MemOpnd, bit Pseudo>:
   FMem<op, (outs), (ins RC:$ra, MemOpnd:$addr),
      !strconcat(instr_asm, "\t$ra, $addr"),
@@ -166,113 +129,62 @@ class StoreM<bits<8> op, string instr_asm, PatFrag OpNode, RegisterClass RC,
 }
 
 //@ 16-bit load.
-multiclass LoadM16<bits<8> op, string instr_asm, PatFrag OpNode,
+multiclass LoadM16<bits<4> op, string instr_asm, PatFrag OpNode,
                    bit Pseudo = 0> {
-// When defm LD : LoadM16<...>, then #NAME# is LD
-// When defm LB : LoadM16<...>, then #NAME# is LB
   def NAME : LoadM<op, instr_asm, OpNode, GPROut, mem, Pseudo>;
 }
 
 // 16-bit store.
-multiclass StoreM16<bits<8> op, string instr_asm, PatFrag OpNode,
+multiclass StoreM16<bits<4> op, string instr_asm, PatFrag OpNode,
                     bit Pseudo = 0> {
   def NAME : StoreM<op, instr_asm, OpNode, CPURegs, mem, Pseudo>;
 }
 
-//@JumpFR {
-let isBranch=1, isTerminator=1, isBarrier=1, imm16=0, hasDelaySlot = 1,
-    isIndirectBranch = 1 in
-class JumpFR<bits<8> op, string instr_asm, RegisterClass RC>:
-  FL<op, (outs), (ins RC:$ra),
-     !strconcat(instr_asm, "\t$ra"), [(brind RC:$ra)], IIBranch> {
-  let rb = 0;
-  let imm16 = 0;
-}
-//@JumpFR }
 
-// Return instruction
-class RetBase<RegisterClass RC>: JumpFR<0x3c, "ret", RC> {
-  let isReturn = 1;
-  let isCodeGenOnly = 1;
-  let hasCtrlDep = 1;
-  let hasExtraSrcRegAllocReq = 1;
-}
-  
-//===----------------------------------------------------------------------===//
-// Instruction definition
-//===----------------------------------------------------------------------===//
 
 /// Load and Store Instructions
 ///  aligned
-defm LD     : LoadM16<0x01,  "ld",  load_a>;
-defm ST     : StoreM16<0x02, "st",  store_a>;
-
-/// Arithmetic Instructions (ALU Immediate)
-// IR "add" defined in include/llvm/Target/TargetSelectionDAG.td, line 315 (def add).
-def ADDiu   : ArithLogicI<0x09, "addiu", add, simm16, immSExt16, CPURegs>;
-let Predicates = [Ch3_5] in {
-def ORi     : ArithLogicI<0x0d, "ori", or, uimm16, immZExt16, CPURegs>;
-}
-let Predicates = [Ch3_5] in {
-def LUi     : LoadUpper<0x0f, "lui", GPROut, uimm16>;
-}
-
-/// Arithmetic Instructions (3-Operand, R-Type)
-let Predicates = [Ch3_5] in {
-let Predicates = [DisableOverflow] in {
-def ADDu    : ArithLogicR<0x11, "addu", add, IIAlu, CPURegs, 1>;
-}
-}
-
-/// Shift Instructions
-let Predicates = [Ch3_5] in {
-def SHL     : shift_rotate_imm16<0x1e, 0x00, "shl", shl>;
-}
-def JR      : JumpFR<0x3c, "jr", GPROut>;
+defm LD     : LoadM16<0b0010,  "ld",  load_a>;
+defm ST     : StoreM16<0b0011, "st",  store_a>;
 
 
-//===----------------------------------------------------------------------===//
-// LCC profiles and nodes
-def SDT_LCCRet          : SDTypeProfile<0, 1, [SDTCisInt<0>]>;
-def LCCRet : SDNode<"LCCISD::Ret", SDTNone,
-                     [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
-//===----------------------------------------------------------------------===//
 
-/// return $lr
-let Predicates = [Ch3_4] in {
-let isReturn=1, isTerminator=1, hasDelaySlot=1, isBarrier=1, hasCtrlDep=1 in
-  def RetLR : LCCPseudo<(outs), (ins), "", [(LCCRet)]>;
-}
-def RET     : RetBase<GPROut>;
+def imm1 : ImmLeaf<i16, [{return Imm == 1;}]>;
+class PPS<bits<9> vector, string instr_asm, SDNode opNode>:
+          FI<0b1010, vector, (outs GPROut:$ra), (ins CPURegs:$ra),
+          !strconcat(instr_asm, "\t$ra"), [(set GPROut:$ra, (OpNode RC:$rb, imm1:$shamt))], IIAlu>;
 
-/// No operation
-let addr=0 in
-  def NOP   : FJ<0, (outs), (ins), "nop", [], IIAlu>;
+def SRL: PPS<0b000000100, "srl", srl>;
+def SRA: PPS<0b000001000, "sra", sra>;
+def SLL: PPS<0b000010000, "sll", shl>;
 
 
-//===----------------------------------------------------------------------===//
-// Instruction aliases
-class LCCInstAlias<string Asm, dag Result, bit Emit = 0b1> :
-  InstAlias<Asm, Result, Emit>;
-//===----------------------------------------------------------------------===//
-let Predicates = [Ch3_5] in {
-def : LCCInstAlias<"move $dst, $src",
-                    (ADDu GPROut:$dst, GPROut:$src,ZERO), 1>;
-}
 
-//===----------------------------------------------------------------------===//
-//  Arbitrary patterns that map to one or more instructions
-//===----------------------------------------------------------------------===//
-// Small immediates
-def : Pat<(i16 immSExt16:$in),
-          (ADDiu ZERO, imm:$in)>;
-let Predicates = [Ch3_5] in {
-def : Pat<(i16 immZExt16:$in),
-          (ORi ZERO, imm:$in)>;
-def : Pat<(i16 immLow16Zero:$in),
-          (LUi (HI16 imm:$in))>;
-// Arbitrary immediates
-def : Pat<(i16 imm:$imm),
-          (ORi (LUi (HI16 imm:$imm)), (LO16 imm:$imm))>;
-} // let Predicates = [Ch3_4]
 
+// // Return Instruction
+// // Return
+// def LCCRet : SDNode<"LCCISD::Ret", SDTNone,
+//                      [SDNPHasChain, SDNPOptInGlue, SDNPVariadic]>;
+
+// let isReturn=1, isTerminator=1, hasDelaySlot=1, isBarrier=1, hasCtrlDep=1 in
+//   def RetLR : LCCPseudo<(outs), (ins), "", [(LCCRet)]>;
+
+
+// //@JumpFR {
+// let isBranch=1, isTerminator=1, isBarrier=1, imm16=0, hasDelaySlot = 1,
+//     isIndirectBranch = 1 in
+// class JumpFR<bits<8> op, string instr_asm, RegisterClass RC>:
+//   FL<op, (outs), (ins RC:$ra),
+//      !strconcat(instr_asm, "\t$ra"), [(brind RC:$ra)], IIBranch> {
+//   let rb = 0;
+//   let imm16 = 0;
+// }
+// //@JumpFR }
+// class RetBase<RegisterClass RC>: JumpFR<0x3c, "ret", RC> {
+//   let isReturn = 1;
+//   let isCodeGenOnly = 1;
+//   let hasCtrlDep = 1;
+//   let hasExtraSrcRegAllocReq = 1;
+// }
+
+// def RET     : RetBase<GPROut>;
