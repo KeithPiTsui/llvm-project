@@ -174,7 +174,7 @@ class FI <bits<4> op, bits<9> vector, dag outs, dag ins, string asmstr,
 }
 
 def FrmJ      : Format<8>; // format for <opcode> '111' '000000'
-class FJ <bits<4> op, bits<9> vector, dag outs, dag ins, string asmstr,
+class FJ <bits<4> op, dag outs, dag ins, string asmstr,
          list<dag> pattern, InstrItinClass itin>:
       LCCInst<outs, ins, asmstr, pattern, itin, FrmJ> {
   let Opcode = op;
