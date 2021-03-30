@@ -3,12 +3,12 @@
 //  Declarations that describe the CPU0 register file
 //===----------------------------------------------------------------------===//
 // We have banks of 8 registers each.
-class LCCReg<bits<8> Enc, string n> : Register<n> {
+class LCCReg<bits<16> Enc, string n> : Register<n> {
   let HWEncoding = Enc;
   let Namespace = "LCC";
 }
 // LCC CPU Registers
-class LCCGPRReg<bits<8> Enc, string n> : LCCReg<Enc, n>;
+class LCCGPRReg<bits<16> Enc, string n> : LCCReg<Enc, n>;
 
 //===----------------------------------------------------------------------===//
 //@Registers
@@ -36,22 +36,12 @@ let Namespace = "LCC" in {
 def LCCRetValRegs: RegisterClass<"LCC", [i16], 16, (add
   R0)>;
 
-def LCCArgRegs: RegisterClass<"LCC", [i16], 16, ()>;
-
-def LCCTempRegs: RegisterClass<"LCC", [i16], 16, ()>;
-
-def LCCCalleeSavedRegs: RegisterClass<"LCC", [i16], 16, ()>;
-
 def LCCReserved2Regs: RegisterClass<"LCC", [i16], 16, (add
   FP, SP, LR)>;
 
 def CPURegs : RegisterClass<"LCC", [i16], 16, (add
   // Return Values and Arguments
-  LCCRetValRegs, LCCArgRegs,
-  // Not preserved across procedure calls
-  LCCTempRegs,
-  // Callee save
-  LCCCalleeSavedRegs,
+  LCCRetValRegs,
   // Reserved
   LCCReserved2Regs
 )>;

@@ -7,7 +7,7 @@
 include "LCCInstrFormats.td"
 
 // Arithmetic and logical instructions with 2 register operands.
-class ArithLogic2Regs<bits<8> op,
+class ArithLogic2Regs<bits<4> op,
                      string instr_asm,
                      SDNode OpNode,
                      Operand Od,
@@ -23,7 +23,7 @@ class ArithLogic2Regs<bits<8> op,
 }
 
 // Arithmetic and logical instructions with 3 register operands.
-class ArithLogic3Regs<bits<8> op, string instr_asm, SDNode OpNode,
+class ArithLogic3Regs<bits<4> op, string instr_asm, SDNode OpNode,
                   InstrItinClass itin, RegisterClass RC, bit isComm = 0>:
   FA<op, (outs GPROut:$ra), (ins RC:$rb, RC:$rc),
      !strconcat(instr_asm, "\t$ra, $rb, $rc"),
@@ -52,19 +52,19 @@ def ADD: ArithLogic3Regs<0x01, "add", add, IIAlu, CPURegs, 1>;
 def ANDi: ArithLogic2Regs<0x01, "and", and, simm16, imm5PL, CPURegs>;
 def AND: ArithLogic3Regs<0x01, "and", and, IIAlu, CPURegs, 1>;
 
-def CMPi: ArithLogic2Regs<0x01, "cmp", cmp, simm16, imm5PL, CPURegs>;
-def CMP: ArithLogic3Regs<0x01, "cmp", cmp, IIAlu, CPURegs, 1>;
+// def CMPi: ArithLogic2Regs<0x01, "cmp", cmp, simm16, imm5PL, CPURegs>;
+// def CMP: ArithLogic3Regs<0x01, "cmp", cmp, IIAlu, CPURegs, 1>;
 
 def SUBi: ArithLogic2Regs<0x01, "sub", sub, simm16, imm5PL, CPURegs>;
 def SUB: ArithLogic3Regs<0x01, "sub", sub, IIAlu, CPURegs, 1>;
 
 
 //===----------------------------------------------------------------------===//
-// Instruction aliases
+// Instruction aliasesna
 //===----------------------------------------------------------------------===//
-def : LCCInstAlias<"mov $dst, $src",
-                    (ADDi GPROut:$dst, GPROut:$src,ZERO), 1>;
-}
+// def : LCCInstAlias<"mov $dst, $src",
+//                     (ADDi GPROut:$dst, GPROut:$src,ZERO), 1>;
+// }
 
 
 // Address operand
@@ -151,8 +151,9 @@ defm ST     : StoreM16<0b0011, "st",  store_a>;
 
 def imm1 : ImmLeaf<i16, [{return Imm == 1;}]>;
 class PPS<bits<9> vector, string instr_asm, SDNode opNode>:
-          FI<0b1010, vector, (outs GPROut:$ra), (ins CPURegs:$ra),
-          !strconcat(instr_asm, "\t$ra"), [(set GPROut:$ra, (OpNode RC:$rb, imm1:$shamt))], IIAlu>;
+          FI<0b1010, vector, (outs GPROut:$ra), (ins CPURegs:$rb),
+          !strconcat(instr_asm, "\t$ra"),
+          [(set GPROut:$ra, (opNode CPURegs:$rb, imm1))], IIAlu>;
 
 def SRL: PPS<0b000000100, "srl", srl>;
 def SRA: PPS<0b000001000, "sra", sra>;
