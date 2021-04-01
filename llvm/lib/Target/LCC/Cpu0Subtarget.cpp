@@ -1,12 +1,23 @@
-//===-- LCCSubtarget.cpp - LCC Subtarget Information --------------------===//
-// This file implements the LCC specific subclass of TargetSubtargetInfo.
+//===-- Cpu0Subtarget.cpp - Cpu0 Subtarget Information --------------------===//
+//
+//                     The LLVM Compiler Infrastructure
+//
+// This file is distributed under the University of Illinois Open Source
+// License. See LICENSE.TXT for details.
+//
+//===----------------------------------------------------------------------===//
+//
+// This file implements the Cpu0 specific subclass of TargetSubtargetInfo.
+//
 //===----------------------------------------------------------------------===//
 
-#include "LCCSubtarget.h"
-#include "LCC.h"
-#include "LCCMachineFunction.h"
-#include "LCCRegisterInfo.h"
-#include "LCCTargetMachine.h"
+#include "Cpu0Subtarget.h"
+
+#include "Cpu0.h"
+#include "Cpu0MachineFunction.h"
+#include "Cpu0RegisterInfo.h"
+
+#include "Cpu0TargetMachine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/CommandLine.h"
@@ -19,32 +30,32 @@ using namespace llvm;
 
 #define GET_SUBTARGETINFO_TARGET_DESC
 #define GET_SUBTARGETINFO_CTOR
-#include "LCCGenSubtargetInfo.inc"
+#include "Cpu0GenSubtargetInfo.inc"
 
 extern bool FixGlobalBaseReg;
 
-void LCCSubtarget::anchor() {}
+void Cpu0Subtarget::anchor() {}
 
 //@1 {
-LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
+Cpu0Subtarget::Cpu0Subtarget(const Triple &TT, const std::string &CPU,
                              const std::string &FS, bool little,
-                             const LCCTargetMachine &_TM)
+                             const Cpu0TargetMachine &_TM)
     : //@1 }
-      // LCCGenSubtargetInfo will display features by llc -march=cpu0
+      // Cpu0GenSubtargetInfo will display features by llc -march=cpu0
       // -mcpu=help
-      LCCGenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
+      Cpu0GenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
       TargetTriple(TT), TSInfo(),
       InstrInfo(
-          LCCInstrInfo::create(initializeSubtargetDependencies(CPU, FS, TM))),
-      FrameLowering(LCCFrameLowering::create(*this)),
-      TLInfo(LCCTargetLowering::create(TM, *this)) {}
+          Cpu0InstrInfo::create(initializeSubtargetDependencies(CPU, FS, TM))),
+      FrameLowering(Cpu0FrameLowering::create(*this)),
+      TLInfo(Cpu0TargetLowering::create(TM, *this)) {}
 
-bool LCCSubtarget::isPositionIndependent() const {
+bool Cpu0Subtarget::isPositionIndependent() const {
   return TM.isPositionIndependent();
 }
 
-LCCSubtarget &
-LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
+Cpu0Subtarget &
+Cpu0Subtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
                                                const TargetMachine &TM) {
   if (TargetTriple.getArch() == Triple::cpu0 ||
       TargetTriple.getArch() == Triple::cpu0el) {
@@ -63,29 +74,32 @@ LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
   }
 
   if (CPU == "cpu032I")
-    LCCArchVersion = LCC32I;
+    Cpu0ArchVersion = Cpu032I;
   else if (CPU == "cpu032II")
-    LCCArchVersion = LCC32II;
+    Cpu0ArchVersion = Cpu032II;
 
-  if (isLCC32I()) {
+  if (isCpu032I()) {
     HasCmp = true;
     HasSlt = false;
-  } else if (isLCC32II()) {
+  } else if (isCpu032II()) {
     HasCmp = true;
     HasSlt = true;
   } else {
     errs() << "-mcpu must be empty(default:cpu032II), cpu032I or cpu032II"
            << "\n";
   }
+
   // Parse features string.
   ParseSubtargetFeatures(CPU, FS);
   // Initialize scheduling itinerary for the specified CPU.
   InstrItins = getInstrItineraryForCPU(CPU);
+
   return *this;
 }
 
-bool LCCSubtarget::abiUsesSoftFloat() const {
+bool Cpu0Subtarget::abiUsesSoftFloat() const {
   //  return TM->Options.UseSoftFloat;
   return true;
 }
-const LCCABIInfo &LCCSubtarget::getABI() const { return TM.getABI(); }
+
+const Cpu0ABIInfo &Cpu0Subtarget::getABI() const { return TM.getABI(); }

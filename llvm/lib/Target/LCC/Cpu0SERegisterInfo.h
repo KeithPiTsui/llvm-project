@@ -1,4 +1,4 @@
-//===-- LCCSERegisterInfo.h - LCC32 Register Information ------*- C++ -*-===//
+//===-- Cpu0SERegisterInfo.h - Cpu032 Register Information ------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,22 +7,24 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file contains the LCC32/64 implementation of the TargetRegisterInfo
+// This file contains the Cpu032/64 implementation of the TargetRegisterInfo
 // class.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_LCC_LCCSEREGISTERINFO_H
-#define LLVM_LIB_TARGET_LCC_LCCSEREGISTERINFO_H
+#ifndef LLVM_LIB_TARGET_CPU0_CPU0SEREGISTERINFO_H
+#define LLVM_LIB_TARGET_CPU0_CPU0SEREGISTERINFO_H
 
-#include "LCCRegisterInfo.h"
+#include "Cpu0Config.h"
+
+#include "Cpu0RegisterInfo.h"
 
 namespace llvm {
-class LCCSEInstrInfo;
+class Cpu0SEInstrInfo;
 
-class LCCSERegisterInfo : public LCCRegisterInfo {
+class Cpu0SERegisterInfo : public Cpu0RegisterInfo {
 public:
-  LCCSERegisterInfo(const LCCSubtarget &Subtarget);
+  Cpu0SERegisterInfo(const Cpu0Subtarget &Subtarget);
 
   const TargetRegisterClass *intRegClass(unsigned Size) const override;
 };

@@ -1,4 +1,4 @@
-//===-- LCCSERegisterInfo.cpp - CPU0 Register Information ------== -------===//
+//===-- Cpu0SERegisterInfo.cpp - CPU0 Register Information ------== -------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -12,17 +12,17 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "LCCSERegisterInfo.h"
+#include "Cpu0SERegisterInfo.h"
 
 using namespace llvm;
 
 #define DEBUG_TYPE "cpu0-reg-info"
 
-LCCSERegisterInfo::LCCSERegisterInfo(const LCCSubtarget &ST)
-  : LCCRegisterInfo(ST) {}
+Cpu0SERegisterInfo::Cpu0SERegisterInfo(const Cpu0Subtarget &ST)
+  : Cpu0RegisterInfo(ST) {}
 
 const TargetRegisterClass *
-LCCSERegisterInfo::intRegClass(unsigned Size) const {
-  return &LCC::CPURegsRegClass;
+Cpu0SERegisterInfo::intRegClass(unsigned Size) const {
+  return &Cpu0::CPURegsRegClass;
 }
 

@@ -1,4 +1,4 @@
-//===---- LCCABIInfo.h - Information about CPU0 ABI's --------------------===//
+//===---- Cpu0ABIInfo.h - Information about CPU0 ABI's --------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -9,6 +9,8 @@
 
 #ifndef LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0ABIINFO_H
 #define LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0ABIINFO_H
+
+#include "Cpu0Config.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Triple.h"
@@ -21,7 +23,7 @@ class MCTargetOptions;
 class StringRef;
 class TargetRegisterClass;
 
-class LCCABIInfo {
+class Cpu0ABIInfo {
 public:
   enum class ABI { Unknown, O32, S32 };
 
@@ -29,12 +31,12 @@ protected:
   ABI ThisABI;
 
 public:
-  LCCABIInfo(ABI ThisABI) : ThisABI(ThisABI) {}
+  Cpu0ABIInfo(ABI ThisABI) : ThisABI(ThisABI) {}
 
-  static LCCABIInfo Unknown() { return LCCABIInfo(ABI::Unknown); }
-  static LCCABIInfo O32() { return LCCABIInfo(ABI::O32); }
-  static LCCABIInfo S32() { return LCCABIInfo(ABI::S32); }
-  static LCCABIInfo computeTargetABI();
+  static Cpu0ABIInfo Unknown() { return Cpu0ABIInfo(ABI::Unknown); }
+  static Cpu0ABIInfo O32() { return Cpu0ABIInfo(ABI::O32); }
+  static Cpu0ABIInfo S32() { return Cpu0ABIInfo(ABI::S32); }
+  static Cpu0ABIInfo computeTargetABI();
 
   bool IsKnown() const { return ThisABI != ABI::Unknown; }
   bool IsO32() const { return ThisABI == ABI::O32; }
@@ -52,9 +54,9 @@ public:
   unsigned GetCalleeAllocdArgSizeInBytes(CallingConv::ID CC) const;
 
   /// Ordering of ABI's
-  /// LCCGenSubtargetInfo.inc will use this to resolve conflicts when given
+  /// Cpu0GenSubtargetInfo.inc will use this to resolve conflicts when given
   /// multiple ABI options.
-  bool operator<(const LCCABIInfo Other) const {
+  bool operator<(const Cpu0ABIInfo Other) const {
     return ThisABI < Other.GetEnumValue();
   }
 

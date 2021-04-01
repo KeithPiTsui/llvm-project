@@ -1,3 +1,4 @@
-# TargetInfo/CMakeLists.txt
-add_llvm_library(LLVMLCCInfo
-  LCCTargetInfo.cpp)
+add_llvm_library(LLVMCpu0Info
+  Cpu0TargetInfo.cpp
+  )
+

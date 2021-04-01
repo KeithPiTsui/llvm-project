@@ -1,4 +1,4 @@
-//===-- llvm/Target/LCCTargetObjectFile.h - LCC Object Info ---*- C++ -*-===//
+//===-- llvm/Target/Cpu0TargetObjectFile.h - Cpu0 Object Info ---*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,18 +7,20 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_LCC_LCCTARGETOBJECTFILE_H
-#define LLVM_LIB_TARGET_LCC_LCCTARGETOBJECTFILE_H
+#ifndef LLVM_LIB_TARGET_CPU0_CPU0TARGETOBJECTFILE_H
+#define LLVM_LIB_TARGET_CPU0_CPU0TARGETOBJECTFILE_H
 
-#include "LCCTargetMachine.h"
+#include "Cpu0Config.h"
+
+#include "Cpu0TargetMachine.h"
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
 
 namespace llvm {
-class LCCTargetMachine;
-class LCCTargetObjectFile : public TargetLoweringObjectFileELF {
+class Cpu0TargetMachine;
+class Cpu0TargetObjectFile : public TargetLoweringObjectFileELF {
   MCSection *SmallDataSection;
   MCSection *SmallBSSSection;
-  const LCCTargetMachine *TM;
+  const Cpu0TargetMachine *TM;
 
 public:
   void Initialize(MCContext &Ctx, const TargetMachine &TM) override;
