@@ -20,25 +20,18 @@ add_public_tablegen_target(LCCCommonTableGen)
 
 # LCCCodeGen should match with LLVMBuild.txt LCCCodeGen
 add_llvm_target(LCCCodeGen
-  # LCCAsmPrinter.cpp
-  # LCCMCInstLower.cpp
-  # LCCFrameLowering.cpp
-  # LCCInstrInfo.cpp
-  # LCCISelLowering.cpp
-  # LCCMachineFunction.cpp
-  # LCCRegisterInfo.cpp
-  # LCCSEFrameLowering.cpp
-  # LCCSEInstrInfo.cpp
-  # LCCSEISelLowering.cpp
-  # LCCSERegisterInfo.cpp
-  # LCCSubtarget.cpp
-  # LCCTargetObjectFile.cpp
+  LCCFrameLowering.cpp
+  LCCInstrInfo.cpp
+  LCCISelLowering.cpp
+  LCCMachineFunction.cpp
+  LCCRegisterInfo.cpp
+  LCCSEFrameLowering.cpp
+  LCCSEInstrInfo.cpp
+  LCCSEISelLowering.cpp
+  LCCSERegisterInfo.cpp
+  LCCSubtarget.cpp
+  LCCTargetObjectFile.cpp
   LCCTargetMachine.cpp
-
-  # LCCISelDAGToDAG.cpp
-  # LCCSEISelDAGToDAG.cpp
-
-  # LCCAnalyzeImmediate.cpp
   )
 
 # Should match with "subdirectories =  MCTargetDesc TargetInfo" in LLVMBuild.txt

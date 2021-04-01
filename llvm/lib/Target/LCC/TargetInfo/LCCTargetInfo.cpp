@@ -5,6 +5,6 @@
 using namespace llvm;
 Target llvm::TheLCCTarget;
 extern "C" void LLVMInitializeLCCTargetInfo() {
-  RegisterTarget<Triple::NT,
+  RegisterTarget<Triple::LCC,
                  /*HasJIT=*/true> X(TheLCCTarget, "LCC", "LCC", "LCC");
 }
