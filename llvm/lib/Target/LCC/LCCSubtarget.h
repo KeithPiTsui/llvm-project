@@ -37,21 +37,21 @@ class LCCSubtarget : public LCCGenSubtargetInfo {
   virtual void anchor();
 
 protected:
-  enum LCCArchEnum { LCC32I, LCC32II };
+  // enum LCCArchEnum { LCC32I, LCC32II };
 
-  // LCC architecture version
-  LCCArchEnum LCCArchVersion;
+  // // LCC architecture version
+  // LCCArchEnum LCCArchVersion;
 
-  // IsLittle - The target is Little Endian
+  // // IsLittle - The target is Little Endian
   bool IsLittle;
 
-  bool EnableOverflow;
+  // bool EnableOverflow;
 
-  // HasCmp - cmp instructions.
-  bool HasCmp;
+  // // HasCmp - cmp instructions.
+  // bool HasCmp;
 
-  // HasSlt - slt instructions.
-  bool HasSlt;
+  // // HasSlt - slt instructions.
+  // bool HasSlt;
 
   InstrItineraryData InstrItins;
 
@@ -80,20 +80,20 @@ public:
   void ParseSubtargetFeatures(StringRef CPU, StringRef FS);
 
   bool isLittle() const { return IsLittle; }
-  bool hasLCC32I() const { return LCCArchVersion >= LCC32I; }
-  bool isLCC32I() const { return LCCArchVersion == LCC32I; }
-  bool hasLCC32II() const { return LCCArchVersion >= LCC32II; }
-  bool isLCC32II() const { return LCCArchVersion == LCC32II; }
+  // bool hasLCC32I() const { return LCCArchVersion >= LCC32I; }
+  // bool isLCC32I() const { return LCCArchVersion == LCC32I; }
+  // bool hasLCC32II() const { return LCCArchVersion >= LCC32II; }
+  // bool isLCC32II() const { return LCCArchVersion == LCC32II; }
 
-  /// Features related to the presence of specific instructions.
-  bool enableOverflow() const { return EnableOverflow; }
-  bool disableOverflow() const { return !EnableOverflow; }
-  bool hasCmp() const { return HasCmp; }
-  bool hasSlt() const { return HasSlt; }
+  // /// Features related to the presence of specific instructions.
+  // bool enableOverflow() const { return EnableOverflow; }
+  // bool disableOverflow() const { return !EnableOverflow; }
+  // bool hasCmp() const { return HasCmp; }
+  // bool hasSlt() const { return HasSlt; }
 
   bool abiUsesSoftFloat() const;
 
-  bool enableLongBranchPass() const { return hasLCC32II(); }
+  // bool enableLongBranchPass() const { return hasLCC32II(); }
 
   Align stackAlignment() const { return Align(8); }
 

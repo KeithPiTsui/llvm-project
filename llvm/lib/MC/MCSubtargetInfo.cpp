@@ -303,14 +303,14 @@ const MCSchedModel &MCSubtargetInfo::getSchedModelForCPU(StringRef CPU) const {
   const SubtargetSubTypeKV *CPUEntry = Find(CPU, ProcDesc);
 
   if (!CPUEntry) {
-    if (CPU != "help") // Don't error if the user asked for help.
-#if 1                  // Disable reconginized processor message. For Cpu0
-      if (TargetTriple.getArch() != llvm::Triple::cpu0 &&
-          TargetTriple.getArch() != llvm::Triple::cpu0el)
-#endif
-        errs() << "'" << CPU
-               << "' is not a recognized processor for this target"
-               << " (ignoring processor)\n";
+    // if (CPU != "help") // Don't error if the user asked for help.
+// #if 1                  // Disable reconginized processor message. For Cpu0
+//       if (TargetTriple.getArch() != llvm::Triple::cpu0 &&
+//           TargetTriple.getArch() != llvm::Triple::cpu0el)
+// #endif
+//         errs() << "'" << CPU
+//                << "' is not a recognized processor for this target"
+//                << " (ignoring processor)\n";
     return MCSchedModel::GetDefaultSchedModel();
   }
   assert(CPUEntry->SchedModel && "Missing processor SchedModel value");
