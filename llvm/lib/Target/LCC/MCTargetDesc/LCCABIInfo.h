@@ -10,7 +10,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
 #define LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
 
-#include "LCCConfig.h"
+
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Triple.h"

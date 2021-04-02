@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 #define LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 
-#include "LCCConfig.h"
+
 
 #include "LCC.h"
 #include "llvm/CodeGen/Register.h"

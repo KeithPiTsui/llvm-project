@@ -13,7 +13,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
 
-#include "LCCConfig.h"
+
 
 #include "LCC.h"
 #include "llvm/CodeGen/TargetFrameLowering.h"

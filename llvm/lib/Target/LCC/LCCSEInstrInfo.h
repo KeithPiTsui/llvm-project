@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCSEINSTRINFO_H
 #define LLVM_LIB_TARGET_LCC_LCCSEINSTRINFO_H
 
-#include "LCCConfig.h"
+
 
 #include "LCCInstrInfo.h"
 #include "LCCMachineFunction.h"

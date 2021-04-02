@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCSUBTARGET_H
 #define LLVM_LIB_TARGET_LCC_LCCSUBTARGET_H
 
-#include "LCCConfig.h"
+
 
 #include "LCCFrameLowering.h"
 #include "LCCISelLowering.h"

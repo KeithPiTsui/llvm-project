@@ -15,7 +15,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCISELLOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCISELLOWERING_H
 
-#include "LCCConfig.h"
+
 
 #include "MCTargetDesc/LCCABIInfo.h"
 #include "LCC.h"

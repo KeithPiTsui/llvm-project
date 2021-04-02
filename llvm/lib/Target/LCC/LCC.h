@@ -15,7 +15,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCC_H
 #define LLVM_LIB_TARGET_LCC_LCC_H
 
-#include "LCCConfig.h"
+
 #include "MCTargetDesc/LCCMCTargetDesc.h"
 #include "llvm/Target/TargetMachine.h"
 

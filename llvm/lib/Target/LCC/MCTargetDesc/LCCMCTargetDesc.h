@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCMCTARGETDESC_H
 #define LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCMCTARGETDESC_H
 
-#include "LCCConfig.h"
+
 #include "llvm/Support/DataTypes.h"
 
 namespace llvm {

@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCSEFRAMELOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCSEFRAMELOWERING_H
 
-#include "LCCConfig.h"
+
 
 #include "LCCFrameLowering.h"
 

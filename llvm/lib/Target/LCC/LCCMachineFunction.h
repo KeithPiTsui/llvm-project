@@ -14,7 +14,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCMACHINEFUNCTION_H
 #define LLVM_LIB_TARGET_LCC_LCCMACHINEFUNCTION_H
 
-#include "LCCConfig.h"
+
 
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"

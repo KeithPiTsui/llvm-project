@@ -15,7 +15,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCSEISELLOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCSEISELLOWERING_H
 
-#include "LCCConfig.h"
+
 
 #include "LCCISelLowering.h"
 #include "LCCRegisterInfo.h"

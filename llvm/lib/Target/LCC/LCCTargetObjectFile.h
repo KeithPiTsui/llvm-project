@@ -10,7 +10,7 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCTARGETOBJECTFILE_H
 #define LLVM_LIB_TARGET_LCC_LCCTARGETOBJECTFILE_H
 
-#include "LCCConfig.h"
+
 
 #include "LCCTargetMachine.h"
 #include "llvm/CodeGen/TargetLoweringObjectFileImpl.h"
