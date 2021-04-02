@@ -13,7 +13,6 @@
 
 #include "LCCTargetMachine.h"
 #include "LCC.h"
-
 #include "LCCSubtarget.h"
 #include "LCCTargetObjectFile.h"
 #include "llvm/CodeGen/Passes.h"
@@ -25,10 +24,7 @@ using namespace llvm;
 #define DEBUG_TYPE "LCC"
 
 extern "C" void LLVMInitializeLCCTarget() {
-  // Register the target.
-  //- Big endian Target Machine
   RegisterTargetMachine<LCCebTargetMachine> X(TheLCCTarget);
-  //- Little endian Target Machine
   RegisterTargetMachine<LCCelTargetMachine> Y(TheLCCelTarget);
 }
 
@@ -65,35 +61,19 @@ static Reloc::Model getEffectiveRelocModel(bool JIT,
   return *RM;
 }
 
-// DataLayout --> Big-endian, 32-bit pointer/ABI/alignment
-// The stack is always 8 byte aligned
-// On function prologue, the stack is created by decrementing
-// its pointer. Once decremented, all references are done with positive
-// offset from the stack/frame pointer, using StackGrowsUp enables
-// an easier handling.
-// Using CodeModel::Large enables different CALL behavior.
-
 LCCTargetMachine::LCCTargetMachine(const Target &T, const Triple &TT,
-                                     StringRef CPU, StringRef FS,
-                                     const TargetOptions &Options,
-                                     Optional<Reloc::Model> RM,
-                                     Optional<CodeModel::Model> CM,
-                                     CodeGenOpt::Level OL, bool JIT,
-                                     bool isLittle)
-    //- Default is big endian
+                                   StringRef CPU, StringRef FS,
+                                   const TargetOptions &Options,
+                                   Optional<Reloc::Model> RM,
+                                   Optional<CodeModel::Model> CM,
+                                   CodeGenOpt::Level OL, bool JIT,
+                                   bool isLittle)
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
       isLittle(isLittle), TLOF(std::make_unique<LCCTargetObjectFile>()),
       ABI(LCCABIInfo::computeTargetABI()),
-      /// This constructor initializes the data members to match that
-      /// of the specified triple.
-      // LCCSubtarget(const Triple &TT, const std::string &CPU,
-      //               const std::string &FS, bool little,
-      //               const LCCTargetMachine &_TM);
       DefaultSubtarget(TT, CPU.str(), FS.str(), isLittle, *this) {
-  // initAsmInfo will display features by llc -march=LCC -mcpu=help on 3.7 but
-  // not on 3.6
   initAsmInfo();
 }
 
@@ -102,21 +82,21 @@ LCCTargetMachine::~LCCTargetMachine() {}
 void LCCebTargetMachine::anchor() {}
 
 LCCebTargetMachine::LCCebTargetMachine(const Target &T, const Triple &TT,
-                                         StringRef CPU, StringRef FS,
-                                         const TargetOptions &Options,
-                                         Optional<Reloc::Model> RM,
-                                         Optional<CodeModel::Model> CM,
-                                         CodeGenOpt::Level OL, bool JIT)
+                                       StringRef CPU, StringRef FS,
+                                       const TargetOptions &Options,
+                                       Optional<Reloc::Model> RM,
+                                       Optional<CodeModel::Model> CM,
+                                       CodeGenOpt::Level OL, bool JIT)
     : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, false) {}
 
 void LCCelTargetMachine::anchor() {}
 
 LCCelTargetMachine::LCCelTargetMachine(const Target &T, const Triple &TT,
-                                         StringRef CPU, StringRef FS,
-                                         const TargetOptions &Options,
-                                         Optional<Reloc::Model> RM,
-                                         Optional<CodeModel::Model> CM,
-                                         CodeGenOpt::Level OL, bool JIT)
+                                       StringRef CPU, StringRef FS,
+                                       const TargetOptions &Options,
+                                       Optional<Reloc::Model> RM,
+                                       Optional<CodeModel::Model> CM,
+                                       CodeGenOpt::Level OL, bool JIT)
     : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, true) {}
 
 const LCCSubtarget *
@@ -133,9 +113,6 @@ LCCTargetMachine::getSubtargetImpl(const Function &F) const {
 
   auto &I = SubtargetMap[CPU + FS];
   if (!I) {
-    // This needs to be done before we create a new subtarget since any
-    // creation will depend on the TM and the code generation flags on the
-    // function that reside in TargetOptions.
     resetTargetOptions(F);
     I = std::make_unique<LCCSubtarget>(TargetTriple, CPU, FS, isLittle, *this);
   }
@@ -143,8 +120,6 @@ LCCTargetMachine::getSubtargetImpl(const Function &F) const {
 }
 
 namespace {
-//@LCCPassConfig {
-/// LCC Code Generator Pass Configuration Options.
 class LCCPassConfig : public TargetPassConfig {
 public:
   LCCPassConfig(LCCTargetMachine *TM, PassManagerBase &PM)
