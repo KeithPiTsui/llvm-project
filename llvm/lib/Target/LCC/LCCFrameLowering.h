@@ -1,4 +1,4 @@
-//===-- Cpu0FrameLowering.h - Define frame lowering for Cpu0 ----*- C++ -*-===//
+//===-- LCCFrameLowering.h - Define frame lowering for LCC ----*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -10,36 +10,36 @@
 //
 //
 //===----------------------------------------------------------------------===//
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0FRAMELOWERING_H
-#define LLVM_LIB_TARGET_CPU0_CPU0FRAMELOWERING_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
+#define LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0.h"
+#include "LCC.h"
 #include "llvm/CodeGen/TargetFrameLowering.h"
 #include "llvm/Support/Alignment.h"
 
 namespace llvm {
-  class Cpu0Subtarget;
+  class LCCSubtarget;
 
-class Cpu0FrameLowering : public TargetFrameLowering {
+class LCCFrameLowering : public TargetFrameLowering {
 protected:
-  const Cpu0Subtarget &STI;
+  const LCCSubtarget &STI;
 
 public:
-  explicit Cpu0FrameLowering(const Cpu0Subtarget &sti, Align Alignment)
+  explicit LCCFrameLowering(const LCCSubtarget &sti, Align Alignment)
     : TargetFrameLowering(StackGrowsDown, Alignment, 0, Alignment),
       STI(sti) {
   }
 
-  static const Cpu0FrameLowering *create(const Cpu0Subtarget &ST);
+  static const LCCFrameLowering *create(const LCCSubtarget &ST);
 
   bool hasFP(const MachineFunction &MF) const override;
 
 };
 
-/// Create Cpu0FrameLowering objects.
-const Cpu0FrameLowering *createCpu0SEFrameLowering(const Cpu0Subtarget &ST);
+/// Create LCCFrameLowering objects.
+const LCCFrameLowering *createLCCSEFrameLowering(const LCCSubtarget &ST);
 
 } // End llvm namespace
 

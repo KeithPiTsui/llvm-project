@@ -1,6 +1,6 @@
 //===-- LCCRegisterInfo.td - LCC Register defs -----------*- tablegen -*-===//
 //===----------------------------------------------------------------------===//
-//  Declarations that describe the CPU0 register file
+//  Declarations that describe the LCC register file
 //===----------------------------------------------------------------------===//
 // We have banks of 8 registers each.
 class LCCReg<bits<16> Enc, string n> : Register<n> {

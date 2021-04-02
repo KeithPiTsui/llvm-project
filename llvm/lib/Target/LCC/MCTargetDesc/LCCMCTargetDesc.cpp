@@ -1,4 +1,4 @@
-//===-- Cpu0MCTargetDesc.cpp - Cpu0 Target Descriptions -------------------===//
+//===-- LCCMCTargetDesc.cpp - LCC Target Descriptions -------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,11 +7,11 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file provides Cpu0 specific target descriptions.
+// This file provides LCC specific target descriptions.
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0MCTargetDesc.h"
+#include "LCCMCTargetDesc.h"
 #include "llvm/MC/MachineLocation.h"
 #include "llvm/MC/MCELFStreamer.h"
 #include "llvm/MC/MCInstrAnalysis.h"
@@ -28,16 +28,16 @@
 using namespace llvm;
 
 #define GET_INSTRINFO_MC_DESC
-#include "Cpu0GenInstrInfo.inc"
+#include "LCCGenInstrInfo.inc"
 
 #define GET_SUBTARGETINFO_MC_DESC
-#include "Cpu0GenSubtargetInfo.inc"
+#include "LCCGenSubtargetInfo.inc"
 
 #define GET_REGINFO_MC_DESC
-#include "Cpu0GenRegisterInfo.inc"
+#include "LCCGenRegisterInfo.inc"
 
 //@2 {
-extern "C" void LLVMInitializeCpu0TargetMC() {
+extern "C" void LLVMInitializeLCCTargetMC() {
 
 }
 //@2 }

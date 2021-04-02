@@ -1,5 +1,5 @@
-#ifndef _CPU0CONFIG_H_
-#define _CPU0CONFIG_H_
+#ifndef _LCCCONFIG_H_
+#define _LCCCONFIG_H_
 
 #define ENABLE_GPRESTORE
 
@@ -24,7 +24,7 @@
 #define CH11_2    112
 #define CH12_1    121
 
-#include "Cpu0SetChapter.h"
+#include "LCCSetChapter.h"
 
 #endif
 

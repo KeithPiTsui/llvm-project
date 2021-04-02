@@ -1,4 +1,4 @@
-//===---- Cpu0ABIInfo.h - Information about CPU0 ABI's --------------------===//
+//===---- LCCABIInfo.h - Information about LCC ABI's --------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,10 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0ABIINFO_H
-#define LLVM_LIB_TARGET_CPU0_MCTARGETDESC_CPU0ABIINFO_H
+#ifndef LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
+#define LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Triple.h"
@@ -23,7 +23,7 @@ class MCTargetOptions;
 class StringRef;
 class TargetRegisterClass;
 
-class Cpu0ABIInfo {
+class LCCABIInfo {
 public:
   enum class ABI { Unknown, O32, S32 };
 
@@ -31,12 +31,12 @@ protected:
   ABI ThisABI;
 
 public:
-  Cpu0ABIInfo(ABI ThisABI) : ThisABI(ThisABI) {}
+  LCCABIInfo(ABI ThisABI) : ThisABI(ThisABI) {}
 
-  static Cpu0ABIInfo Unknown() { return Cpu0ABIInfo(ABI::Unknown); }
-  static Cpu0ABIInfo O32() { return Cpu0ABIInfo(ABI::O32); }
-  static Cpu0ABIInfo S32() { return Cpu0ABIInfo(ABI::S32); }
-  static Cpu0ABIInfo computeTargetABI();
+  static LCCABIInfo Unknown() { return LCCABIInfo(ABI::Unknown); }
+  static LCCABIInfo O32() { return LCCABIInfo(ABI::O32); }
+  static LCCABIInfo S32() { return LCCABIInfo(ABI::S32); }
+  static LCCABIInfo computeTargetABI();
 
   bool IsKnown() const { return ThisABI != ABI::Unknown; }
   bool IsO32() const { return ThisABI == ABI::O32; }
@@ -54,9 +54,9 @@ public:
   unsigned GetCalleeAllocdArgSizeInBytes(CallingConv::ID CC) const;
 
   /// Ordering of ABI's
-  /// Cpu0GenSubtargetInfo.inc will use this to resolve conflicts when given
+  /// LCCGenSubtargetInfo.inc will use this to resolve conflicts when given
   /// multiple ABI options.
-  bool operator<(const Cpu0ABIInfo Other) const {
+  bool operator<(const LCCABIInfo Other) const {
     return ThisABI < Other.GetEnumValue();
   }
 

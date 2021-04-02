@@ -1,4 +1,4 @@
-//===-- Cpu0SEFrameLowering.h - Cpu032/64 frame lowering --------*- C++ -*-===//
+//===-- LCCSEFrameLowering.h - LCC32/64 frame lowering --------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -11,18 +11,18 @@
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0SEFRAMELOWERING_H
-#define LLVM_LIB_TARGET_CPU0_CPU0SEFRAMELOWERING_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCSEFRAMELOWERING_H
+#define LLVM_LIB_TARGET_LCC_LCCSEFRAMELOWERING_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0FrameLowering.h"
+#include "LCCFrameLowering.h"
 
 namespace llvm {
 
-class Cpu0SEFrameLowering : public Cpu0FrameLowering {
+class LCCSEFrameLowering : public LCCFrameLowering {
 public:
-  explicit Cpu0SEFrameLowering(const Cpu0Subtarget &STI);
+  explicit LCCSEFrameLowering(const LCCSubtarget &STI);
 
   /// emitProlog/emitEpilog - These methods insert prolog and epilog code into
   /// the function.

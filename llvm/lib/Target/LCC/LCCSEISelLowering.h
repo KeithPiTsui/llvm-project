@@ -1,4 +1,4 @@
-//===-- Cpu0ISEISelLowering.h - Cpu0ISE DAG Lowering Interface ----*- C++
+//===-- LCCISEISelLowering.h - LCCISE DAG Lowering Interface ----*- C++
 //-*-===//
 //
 //                     The LLVM Compiler Infrastructure
@@ -8,23 +8,23 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// Subclass of Cpu0ITargetLowering specialized for cpu032/64.
+// Subclass of LCCITargetLowering specialized for LCC32/64.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0SEISELLOWERING_H
-#define LLVM_LIB_TARGET_CPU0_CPU0SEISELLOWERING_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCSEISELLOWERING_H
+#define LLVM_LIB_TARGET_LCC_LCCSEISELLOWERING_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0ISelLowering.h"
-#include "Cpu0RegisterInfo.h"
+#include "LCCISelLowering.h"
+#include "LCCRegisterInfo.h"
 
 namespace llvm {
-class Cpu0SETargetLowering : public Cpu0TargetLowering {
+class LCCSETargetLowering : public LCCTargetLowering {
 public:
-  explicit Cpu0SETargetLowering(const Cpu0TargetMachine &TM,
-                                const Cpu0Subtarget &STI);
+  explicit LCCSETargetLowering(const LCCTargetMachine &TM,
+                                const LCCSubtarget &STI);
 
   SDValue LowerOperation(SDValue Op, SelectionDAG &DAG) const override;
 
@@ -32,4 +32,4 @@ private:
 };
 } // namespace llvm
 
-#endif // Cpu0ISEISELLOWERING_H
+#endif // LCCISEISELLOWERING_H

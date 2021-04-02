@@ -1,4 +1,4 @@
-//===-- Cpu0Subtarget.cpp - Cpu0 Subtarget Information --------------------===//
+//===-- LCCSubtarget.cpp - LCC Subtarget Information --------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,17 +7,17 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file implements the Cpu0 specific subclass of TargetSubtargetInfo.
+// This file implements the LCC specific subclass of TargetSubtargetInfo.
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0Subtarget.h"
+#include "LCCSubtarget.h"
 
-#include "Cpu0.h"
-#include "Cpu0MachineFunction.h"
-#include "Cpu0RegisterInfo.h"
+#include "LCC.h"
+#include "LCCMachineFunction.h"
+#include "LCCRegisterInfo.h"
 
-#include "Cpu0TargetMachine.h"
+#include "LCCTargetMachine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/CommandLine.h"
@@ -26,46 +26,46 @@
 
 using namespace llvm;
 
-#define DEBUG_TYPE "cpu0-subtarget"
+#define DEBUG_TYPE "LCC-subtarget"
 
 #define GET_SUBTARGETINFO_TARGET_DESC
 #define GET_SUBTARGETINFO_CTOR
-#include "Cpu0GenSubtargetInfo.inc"
+#include "LCCGenSubtargetInfo.inc"
 
 extern bool FixGlobalBaseReg;
 
-void Cpu0Subtarget::anchor() {}
+void LCCSubtarget::anchor() {}
 
 //@1 {
-Cpu0Subtarget::Cpu0Subtarget(const Triple &TT, const std::string &CPU,
+LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
                              const std::string &FS, bool little,
-                             const Cpu0TargetMachine &_TM)
+                             const LCCTargetMachine &_TM)
     : //@1 }
-      // Cpu0GenSubtargetInfo will display features by llc -march=cpu0
+      // LCCGenSubtargetInfo will display features by llc -march=LCC
       // -mcpu=help
-      Cpu0GenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
+      LCCGenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
       TargetTriple(TT), TSInfo(),
       InstrInfo(
-          Cpu0InstrInfo::create(initializeSubtargetDependencies(CPU, FS, TM))),
-      FrameLowering(Cpu0FrameLowering::create(*this)),
-      TLInfo(Cpu0TargetLowering::create(TM, *this)) {}
+          LCCInstrInfo::create(initializeSubtargetDependencies(CPU, FS, TM))),
+      FrameLowering(LCCFrameLowering::create(*this)),
+      TLInfo(LCCTargetLowering::create(TM, *this)) {}
 
-bool Cpu0Subtarget::isPositionIndependent() const {
+bool LCCSubtarget::isPositionIndependent() const {
   return TM.isPositionIndependent();
 }
 
-Cpu0Subtarget &
-Cpu0Subtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
+LCCSubtarget &
+LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
                                                const TargetMachine &TM) {
-  if (TargetTriple.getArch() == Triple::cpu0 ||
-      TargetTriple.getArch() == Triple::cpu0el) {
+  if (TargetTriple.getArch() == Triple::LCC ||
+      TargetTriple.getArch() == Triple::LCCel) {
     if (CPU.empty() || CPU == "generic") {
-      CPU = "cpu032II";
+      CPU = "LCC32II";
     } else if (CPU == "help") {
       CPU = "";
       return *this;
-    } else if (CPU != "cpu032I" && CPU != "cpu032II") {
-      CPU = "cpu032II";
+    } else if (CPU != "LCC32I" && CPU != "LCC32II") {
+      CPU = "LCC32II";
     }
   } else {
     errs() << "!!!Error, TargetTriple.getArch() = " << TargetTriple.getArch()
@@ -73,19 +73,19 @@ Cpu0Subtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
     exit(0);
   }
 
-  if (CPU == "cpu032I")
-    Cpu0ArchVersion = Cpu032I;
-  else if (CPU == "cpu032II")
-    Cpu0ArchVersion = Cpu032II;
+  if (CPU == "LCC32I")
+    LCCArchVersion = LCC32I;
+  else if (CPU == "LCC32II")
+    LCCArchVersion = LCC32II;
 
-  if (isCpu032I()) {
+  if (isLCC32I()) {
     HasCmp = true;
     HasSlt = false;
-  } else if (isCpu032II()) {
+  } else if (isLCC32II()) {
     HasCmp = true;
     HasSlt = true;
   } else {
-    errs() << "-mcpu must be empty(default:cpu032II), cpu032I or cpu032II"
+    errs() << "-mcpu must be empty(default:LCC32II), LCC32I or LCC32II"
            << "\n";
   }
 
@@ -97,9 +97,9 @@ Cpu0Subtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
   return *this;
 }
 
-bool Cpu0Subtarget::abiUsesSoftFloat() const {
+bool LCCSubtarget::abiUsesSoftFloat() const {
   //  return TM->Options.UseSoftFloat;
   return true;
 }
 
-const Cpu0ABIInfo &Cpu0Subtarget::getABI() const { return TM.getABI(); }
+const LCCABIInfo &LCCSubtarget::getABI() const { return TM.getABI(); }

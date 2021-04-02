@@ -1,4 +1,4 @@
-//===-- Cpu0.td - Describe the LCC Target Machine ---------*- tablegen -*-===//
+//===-- LCC.td - Describe the LCC Target Machine ---------*- tablegen -*-===//
 //===----------------------------------------------------------------------===//
 // Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//

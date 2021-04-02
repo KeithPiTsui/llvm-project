@@ -1,4 +1,4 @@
-//===-- Cpu0ISelLowering.cpp - Cpu0 DAG Lowering Implementation -----------===//
+//===-- LCCISelLowering.cpp - LCC DAG Lowering Implementation -----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,16 +7,16 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file defines the interfaces that Cpu0 uses to lower LLVM code into a
+// This file defines the interfaces that LCC uses to lower LLVM code into a
 // selection DAG.
 //
 //===----------------------------------------------------------------------===//
-#include "Cpu0ISelLowering.h"
+#include "LCCISelLowering.h"
 
-#include "Cpu0MachineFunction.h"
-#include "Cpu0Subtarget.h"
-#include "Cpu0TargetMachine.h"
-#include "Cpu0TargetObjectFile.h"
+#include "LCCMachineFunction.h"
+#include "LCCSubtarget.h"
+#include "LCCTargetMachine.h"
+#include "LCCTargetObjectFile.h"
 #include "llvm/ADT/Statistic.h"
 #include "llvm/CodeGen/CallingConvLower.h"
 #include "llvm/CodeGen/MachineFrameInfo.h"
@@ -35,46 +35,46 @@
 
 using namespace llvm;
 
-#define DEBUG_TYPE "cpu0-lower"
+#define DEBUG_TYPE "LCC-lower"
 
 //@3_1 1 {
-const char *Cpu0TargetLowering::getTargetNodeName(unsigned Opcode) const {
+const char *LCCTargetLowering::getTargetNodeName(unsigned Opcode) const {
   switch (Opcode) {
-  case Cpu0ISD::JmpLink:
-    return "Cpu0ISD::JmpLink";
-  case Cpu0ISD::TailCall:
-    return "Cpu0ISD::TailCall";
-  case Cpu0ISD::Hi:
-    return "Cpu0ISD::Hi";
-  case Cpu0ISD::Lo:
-    return "Cpu0ISD::Lo";
-  case Cpu0ISD::GPRel:
-    return "Cpu0ISD::GPRel";
-  case Cpu0ISD::Ret:
-    return "Cpu0ISD::Ret";
-  case Cpu0ISD::EH_RETURN:
-    return "Cpu0ISD::EH_RETURN";
-  case Cpu0ISD::DivRem:
-    return "Cpu0ISD::DivRem";
-  case Cpu0ISD::DivRemU:
-    return "Cpu0ISD::DivRemU";
-  case Cpu0ISD::Wrapper:
-    return "Cpu0ISD::Wrapper";
+  case LCCISD::JmpLink:
+    return "LCCISD::JmpLink";
+  case LCCISD::TailCall:
+    return "LCCISD::TailCall";
+  case LCCISD::Hi:
+    return "LCCISD::Hi";
+  case LCCISD::Lo:
+    return "LCCISD::Lo";
+  case LCCISD::GPRel:
+    return "LCCISD::GPRel";
+  case LCCISD::Ret:
+    return "LCCISD::Ret";
+  case LCCISD::EH_RETURN:
+    return "LCCISD::EH_RETURN";
+  case LCCISD::DivRem:
+    return "LCCISD::DivRem";
+  case LCCISD::DivRemU:
+    return "LCCISD::DivRemU";
+  case LCCISD::Wrapper:
+    return "LCCISD::Wrapper";
   default:
     return NULL;
   }
 }
 //@3_1 1 }
 
-//@Cpu0TargetLowering {
-Cpu0TargetLowering::Cpu0TargetLowering(const Cpu0TargetMachine &TM,
-                                       const Cpu0Subtarget &STI)
+//@LCCTargetLowering {
+LCCTargetLowering::LCCTargetLowering(const LCCTargetMachine &TM,
+                                       const LCCSubtarget &STI)
     : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {}
 
-const Cpu0TargetLowering *
-Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
-                           const Cpu0Subtarget &STI) {
-  return llvm::createCpu0SETargetLowering(TM, STI);
+const LCCTargetLowering *
+LCCTargetLowering::create(const LCCTargetMachine &TM,
+                           const LCCSubtarget &STI) {
+  return llvm::createLCCSETargetLowering(TM, STI);
 }
 
 //===----------------------------------------------------------------------===//
@@ -85,7 +85,7 @@ Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
 //  Misc Lower Operation implementation
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0GenCallingConv.inc"
+#include "LCCGenCallingConv.inc"
 
 //===----------------------------------------------------------------------===//
 //@            Formal Arguments Calling Convention Implementation
@@ -94,7 +94,7 @@ Cpu0TargetLowering::create(const Cpu0TargetMachine &TM,
 //@LowerFormalArguments {
 /// LowerFormalArguments - transform physical registers into virtual registers
 /// and generate load operations for arguments places on the stack.
-SDValue Cpu0TargetLowering::LowerFormalArguments(
+SDValue LCCTargetLowering::LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
     const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
     SelectionDAG &DAG, SmallVectorImpl<SDValue> &InVals) const {
@@ -108,11 +108,11 @@ SDValue Cpu0TargetLowering::LowerFormalArguments(
 //===----------------------------------------------------------------------===//
 
 SDValue
-Cpu0TargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
+LCCTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
                                 bool IsVarArg,
                                 const SmallVectorImpl<ISD::OutputArg> &Outs,
                                 const SmallVectorImpl<SDValue> &OutVals,
                                 const SDLoc &DL, SelectionDAG &DAG) const {
-  return DAG.getNode(Cpu0ISD::Ret, DL, MVT::Other, Chain,
-                     DAG.getRegister(Cpu0::LR, MVT::i32));
+  return DAG.getNode(LCCISD::Ret, DL, MVT::Other, Chain,
+                     DAG.getRegister(LCC::LR, MVT::i32));
 }

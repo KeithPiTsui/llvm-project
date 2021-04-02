@@ -1,4 +1,4 @@
-//===-- Cpu0SEISelLowering.cpp - Cpu0SE DAG Lowering Interface --*- C++ -*-===//
+//===-- LCCSEISelLowering.cpp - LCCSE DAG Lowering Interface --*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,14 +7,14 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// Subclass of Cpu0TargetLowering specialized for cpu032.
+// Subclass of LCCTargetLowering specialized for LCC32.
 //
 //===----------------------------------------------------------------------===//
-#include "Cpu0SEISelLowering.h"
-#include "Cpu0MachineFunction.h"
+#include "LCCSEISelLowering.h"
+#include "LCCMachineFunction.h"
 
-#include "Cpu0RegisterInfo.h"
-#include "Cpu0TargetMachine.h"
+#include "LCCRegisterInfo.h"
+#include "LCCTargetMachine.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
 #include "llvm/CodeGen/TargetInstrInfo.h"
@@ -25,33 +25,33 @@
 
 using namespace llvm;
 
-#define DEBUG_TYPE "cpu0-isel"
+#define DEBUG_TYPE "LCC-isel"
 
-static cl::opt<bool> EnableCpu0TailCalls("enable-cpu0-tail-calls", cl::Hidden,
-                                         cl::desc("CPU0: Enable tail calls."),
+static cl::opt<bool> EnableLCCTailCalls("enable-LCC-tail-calls", cl::Hidden,
+                                         cl::desc("LCC: Enable tail calls."),
                                          cl::init(false));
 
-//@Cpu0SETargetLowering {
-Cpu0SETargetLowering::Cpu0SETargetLowering(const Cpu0TargetMachine &TM,
-                                           const Cpu0Subtarget &STI)
-    : Cpu0TargetLowering(TM, STI) {
-  //@Cpu0SETargetLowering body {
+//@LCCSETargetLowering {
+LCCSETargetLowering::LCCSETargetLowering(const LCCTargetMachine &TM,
+                                           const LCCSubtarget &STI)
+    : LCCTargetLowering(TM, STI) {
+  //@LCCSETargetLowering body {
   // Set up the register classes
-  addRegisterClass(MVT::i32, &Cpu0::CPURegsRegClass);
+  addRegisterClass(MVT::i32, &LCC::CPURegsRegClass);
 
   // must, computeRegisterProperties - Once all of the register classes are
   //  added, this allows us to compute derived properties we expose.
   computeRegisterProperties(Subtarget.getRegisterInfo());
 }
 
-SDValue Cpu0SETargetLowering::LowerOperation(SDValue Op,
+SDValue LCCSETargetLowering::LowerOperation(SDValue Op,
                                              SelectionDAG &DAG) const {
 
-  return Cpu0TargetLowering::LowerOperation(Op, DAG);
+  return LCCTargetLowering::LowerOperation(Op, DAG);
 }
 
-const Cpu0TargetLowering *
-llvm::createCpu0SETargetLowering(const Cpu0TargetMachine &TM,
-                                 const Cpu0Subtarget &STI) {
-  return new Cpu0SETargetLowering(TM, STI);
+const LCCTargetLowering *
+llvm::createLCCSETargetLowering(const LCCTargetMachine &TM,
+                                 const LCCSubtarget &STI) {
+  return new LCCSETargetLowering(TM, STI);
 }

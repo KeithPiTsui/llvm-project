@@ -1,4 +1,4 @@
-//===-- Cpu0SEInstrInfo.h - Cpu032/64 Instruction Information ---*- C++ -*-===//
+//===-- LCCSEInstrInfo.h - LCC32/64 Instruction Information ---*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,28 +7,28 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file contains the Cpu032/64 implementation of the TargetInstrInfo class.
+// This file contains the LCC32/64 implementation of the TargetInstrInfo class.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0SEINSTRINFO_H
-#define LLVM_LIB_TARGET_CPU0_CPU0SEINSTRINFO_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCSEINSTRINFO_H
+#define LLVM_LIB_TARGET_LCC_LCCSEINSTRINFO_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0InstrInfo.h"
-#include "Cpu0MachineFunction.h"
-#include "Cpu0SERegisterInfo.h"
+#include "LCCInstrInfo.h"
+#include "LCCMachineFunction.h"
+#include "LCCSERegisterInfo.h"
 
 namespace llvm {
 
-class Cpu0SEInstrInfo : public Cpu0InstrInfo {
-  const Cpu0SERegisterInfo RI;
+class LCCSEInstrInfo : public LCCInstrInfo {
+  const LCCSERegisterInfo RI;
 
 public:
-  explicit Cpu0SEInstrInfo(const Cpu0Subtarget &STI);
+  explicit LCCSEInstrInfo(const LCCSubtarget &STI);
 
-  const Cpu0RegisterInfo &getRegisterInfo() const override;
+  const LCCRegisterInfo &getRegisterInfo() const override;
 };
 
 } // namespace llvm

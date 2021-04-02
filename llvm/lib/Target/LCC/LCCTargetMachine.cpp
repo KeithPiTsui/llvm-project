@@ -1,4 +1,4 @@
-//===-- Cpu0TargetMachine.cpp - Define TargetMachine for Cpu0 -------------===//
+//===-- LCCTargetMachine.cpp - Define TargetMachine for LCC -------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,36 +7,36 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// Implements the info about Cpu0 target spec.
+// Implements the info about LCC target spec.
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0TargetMachine.h"
-#include "Cpu0.h"
+#include "LCCTargetMachine.h"
+#include "LCC.h"
 
-#include "Cpu0Subtarget.h"
-#include "Cpu0TargetObjectFile.h"
+#include "LCCSubtarget.h"
+#include "LCCTargetObjectFile.h"
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/CodeGen/TargetPassConfig.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Support/TargetRegistry.h"
 using namespace llvm;
 
-#define DEBUG_TYPE "cpu0"
+#define DEBUG_TYPE "LCC"
 
-extern "C" void LLVMInitializeCpu0Target() {
+extern "C" void LLVMInitializeLCCTarget() {
   // Register the target.
   //- Big endian Target Machine
-  RegisterTargetMachine<Cpu0ebTargetMachine> X(TheCpu0Target);
+  RegisterTargetMachine<LCCebTargetMachine> X(TheLCCTarget);
   //- Little endian Target Machine
-  RegisterTargetMachine<Cpu0elTargetMachine> Y(TheCpu0elTarget);
+  RegisterTargetMachine<LCCelTargetMachine> Y(TheLCCelTarget);
 }
 
 static std::string computeDataLayout(const Triple &TT, StringRef CPU,
                                      const TargetOptions &Options,
                                      bool isLittle) {
   std::string Ret = "";
-  // There are both little and big endian cpu0.
+  // There are both little and big endian LCC.
   if (isLittle)
     Ret += "e";
   else
@@ -73,7 +73,7 @@ static Reloc::Model getEffectiveRelocModel(bool JIT,
 // an easier handling.
 // Using CodeModel::Large enables different CALL behavior.
 
-Cpu0TargetMachine::Cpu0TargetMachine(const Target &T, const Triple &TT,
+LCCTargetMachine::LCCTargetMachine(const Target &T, const Triple &TT,
                                      StringRef CPU, StringRef FS,
                                      const TargetOptions &Options,
                                      Optional<Reloc::Model> RM,
@@ -84,43 +84,43 @@ Cpu0TargetMachine::Cpu0TargetMachine(const Target &T, const Triple &TT,
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
-      isLittle(isLittle), TLOF(std::make_unique<Cpu0TargetObjectFile>()),
-      ABI(Cpu0ABIInfo::computeTargetABI()),
+      isLittle(isLittle), TLOF(std::make_unique<LCCTargetObjectFile>()),
+      ABI(LCCABIInfo::computeTargetABI()),
       /// This constructor initializes the data members to match that
       /// of the specified triple.
-      // Cpu0Subtarget(const Triple &TT, const std::string &CPU,
+      // LCCSubtarget(const Triple &TT, const std::string &CPU,
       //               const std::string &FS, bool little,
-      //               const Cpu0TargetMachine &_TM);
+      //               const LCCTargetMachine &_TM);
       DefaultSubtarget(TT, CPU.str(), FS.str(), isLittle, *this) {
-  // initAsmInfo will display features by llc -march=cpu0 -mcpu=help on 3.7 but
+  // initAsmInfo will display features by llc -march=LCC -mcpu=help on 3.7 but
   // not on 3.6
   initAsmInfo();
 }
 
-Cpu0TargetMachine::~Cpu0TargetMachine() {}
+LCCTargetMachine::~LCCTargetMachine() {}
 
-void Cpu0ebTargetMachine::anchor() {}
+void LCCebTargetMachine::anchor() {}
 
-Cpu0ebTargetMachine::Cpu0ebTargetMachine(const Target &T, const Triple &TT,
+LCCebTargetMachine::LCCebTargetMachine(const Target &T, const Triple &TT,
                                          StringRef CPU, StringRef FS,
                                          const TargetOptions &Options,
                                          Optional<Reloc::Model> RM,
                                          Optional<CodeModel::Model> CM,
                                          CodeGenOpt::Level OL, bool JIT)
-    : Cpu0TargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, false) {}
+    : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, false) {}
 
-void Cpu0elTargetMachine::anchor() {}
+void LCCelTargetMachine::anchor() {}
 
-Cpu0elTargetMachine::Cpu0elTargetMachine(const Target &T, const Triple &TT,
+LCCelTargetMachine::LCCelTargetMachine(const Target &T, const Triple &TT,
                                          StringRef CPU, StringRef FS,
                                          const TargetOptions &Options,
                                          Optional<Reloc::Model> RM,
                                          Optional<CodeModel::Model> CM,
                                          CodeGenOpt::Level OL, bool JIT)
-    : Cpu0TargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, true) {}
+    : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, true) {}
 
-const Cpu0Subtarget *
-Cpu0TargetMachine::getSubtargetImpl(const Function &F) const {
+const LCCSubtarget *
+LCCTargetMachine::getSubtargetImpl(const Function &F) const {
   Attribute CPUAttr = F.getFnAttribute("target-cpu");
   Attribute FSAttr = F.getFnAttribute("target-features");
 
@@ -137,29 +137,29 @@ Cpu0TargetMachine::getSubtargetImpl(const Function &F) const {
     // creation will depend on the TM and the code generation flags on the
     // function that reside in TargetOptions.
     resetTargetOptions(F);
-    I = std::make_unique<Cpu0Subtarget>(TargetTriple, CPU, FS, isLittle, *this);
+    I = std::make_unique<LCCSubtarget>(TargetTriple, CPU, FS, isLittle, *this);
   }
   return I.get();
 }
 
 namespace {
-//@Cpu0PassConfig {
-/// Cpu0 Code Generator Pass Configuration Options.
-class Cpu0PassConfig : public TargetPassConfig {
+//@LCCPassConfig {
+/// LCC Code Generator Pass Configuration Options.
+class LCCPassConfig : public TargetPassConfig {
 public:
-  Cpu0PassConfig(Cpu0TargetMachine *TM, PassManagerBase &PM)
+  LCCPassConfig(LCCTargetMachine *TM, PassManagerBase &PM)
       : TargetPassConfig(*TM, PM) {}
 
-  Cpu0TargetMachine &getCpu0TargetMachine() const {
-    return getTM<Cpu0TargetMachine>();
+  LCCTargetMachine &getLCCTargetMachine() const {
+    return getTM<LCCTargetMachine>();
   }
 
-  const Cpu0Subtarget &getCpu0Subtarget() const {
-    return *getCpu0TargetMachine().getSubtargetImpl();
+  const LCCSubtarget &getLCCSubtarget() const {
+    return *getLCCTargetMachine().getSubtargetImpl();
   }
 };
 } // namespace
 
-TargetPassConfig *Cpu0TargetMachine::createPassConfig(PassManagerBase &PM) {
-  return new Cpu0PassConfig(this, PM);
+TargetPassConfig *LCCTargetMachine::createPassConfig(PassManagerBase &PM) {
+  return new LCCPassConfig(this, PM);
 }

@@ -1,4 +1,4 @@
-//===-- Cpu0Subtarget.h - Define Subtarget for the Cpu0 ---------*- C++ -*-===//
+//===-- LCCSubtarget.h - Define Subtarget for the LCC ---------*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,18 +7,18 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file declares the Cpu0 specific subclass of TargetSubtargetInfo.
+// This file declares the LCC specific subclass of TargetSubtargetInfo.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0SUBTARGET_H
-#define LLVM_LIB_TARGET_CPU0_CPU0SUBTARGET_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCSUBTARGET_H
+#define LLVM_LIB_TARGET_LCC_LCCSUBTARGET_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0FrameLowering.h"
-#include "Cpu0ISelLowering.h"
-#include "Cpu0InstrInfo.h"
+#include "LCCFrameLowering.h"
+#include "LCCISelLowering.h"
+#include "LCCInstrInfo.h"
 #include "llvm/CodeGen/SelectionDAGTargetInfo.h"
 #include "llvm/CodeGen/TargetSubtargetInfo.h"
 #include "llvm/IR/DataLayout.h"
@@ -27,15 +27,15 @@
 #include <string>
 
 #define GET_SUBTARGETINFO_HEADER
-#include "Cpu0GenSubtargetInfo.inc"
+#include "LCCGenSubtargetInfo.inc"
 
 //@1
 namespace llvm {
 class StringRef;
 
-class Cpu0TargetMachine;
+class LCCTargetMachine;
 
-class Cpu0Subtarget : public Cpu0GenSubtargetInfo {
+class LCCSubtarget : public LCCGenSubtargetInfo {
   virtual void anchor();
 
 public:
@@ -81,10 +81,10 @@ public:
   bool hasChapter12_1() const { return false; }
 
 protected:
-  enum Cpu0ArchEnum { Cpu032I, Cpu032II };
+  enum LCCArchEnum { LCC32I, LCC32II };
 
-  // Cpu0 architecture version
-  Cpu0ArchEnum Cpu0ArchVersion;
+  // LCC architecture version
+  LCCArchEnum LCCArchVersion;
 
   // IsLittle - The target is Little Endian
   bool IsLittle;
@@ -99,24 +99,24 @@ protected:
 
   InstrItineraryData InstrItins;
 
-  const Cpu0TargetMachine &TM;
+  const LCCTargetMachine &TM;
 
   Triple TargetTriple;
 
   const SelectionDAGTargetInfo TSInfo;
 
-  std::unique_ptr<const Cpu0InstrInfo> InstrInfo;
-  std::unique_ptr<const Cpu0FrameLowering> FrameLowering;
-  std::unique_ptr<const Cpu0TargetLowering> TLInfo;
+  std::unique_ptr<const LCCInstrInfo> InstrInfo;
+  std::unique_ptr<const LCCFrameLowering> FrameLowering;
+  std::unique_ptr<const LCCTargetLowering> TLInfo;
 
 public:
   bool isPositionIndependent() const;
-  const Cpu0ABIInfo &getABI() const;
+  const LCCABIInfo &getABI() const;
 
   /// This constructor initializes the data members to match that
   /// of the specified triple.
-  Cpu0Subtarget(const Triple &TT, const std::string &CPU, const std::string &FS,
-                bool little, const Cpu0TargetMachine &_TM);
+  LCCSubtarget(const Triple &TT, const std::string &CPU, const std::string &FS,
+                bool little, const LCCTargetMachine &_TM);
 
   //- Vitual function, must have
   /// ParseSubtargetFeatures - Parses features string setting specified
@@ -124,10 +124,10 @@ public:
   void ParseSubtargetFeatures(StringRef CPU, StringRef FS);
 
   bool isLittle() const { return IsLittle; }
-  bool hasCpu032I() const { return Cpu0ArchVersion >= Cpu032I; }
-  bool isCpu032I() const { return Cpu0ArchVersion == Cpu032I; }
-  bool hasCpu032II() const { return Cpu0ArchVersion >= Cpu032II; }
-  bool isCpu032II() const { return Cpu0ArchVersion == Cpu032II; }
+  bool hasLCC32I() const { return LCCArchVersion >= LCC32I; }
+  bool isLCC32I() const { return LCCArchVersion == LCC32I; }
+  bool hasLCC32II() const { return LCCArchVersion >= LCC32II; }
+  bool isLCC32II() const { return LCCArchVersion == LCC32II; }
 
   /// Features related to the presence of specific instructions.
   bool enableOverflow() const { return EnableOverflow; }
@@ -137,24 +137,24 @@ public:
 
   bool abiUsesSoftFloat() const;
 
-  bool enableLongBranchPass() const { return hasCpu032II(); }
+  bool enableLongBranchPass() const { return hasLCC32II(); }
 
   Align stackAlignment() const { return Align(8); }
 
-  Cpu0Subtarget &initializeSubtargetDependencies(StringRef CPU, StringRef FS,
+  LCCSubtarget &initializeSubtargetDependencies(StringRef CPU, StringRef FS,
                                                  const TargetMachine &TM);
 
   const SelectionDAGTargetInfo *getSelectionDAGInfo() const override {
     return &TSInfo;
   }
-  const Cpu0InstrInfo* getInstrInfo() const override { return InstrInfo.get(); }
+  const LCCInstrInfo* getInstrInfo() const override { return InstrInfo.get(); }
   const TargetFrameLowering *getFrameLowering() const override {
     return FrameLowering.get();
   }
-  const Cpu0RegisterInfo *getRegisterInfo() const override {
+  const LCCRegisterInfo *getRegisterInfo() const override {
     return &InstrInfo->getRegisterInfo();
   }
-  const Cpu0TargetLowering *getTargetLowering() const override {
+  const LCCTargetLowering *getTargetLowering() const override {
     return TLInfo.get();
   }
   const InstrItineraryData *getInstrItineraryData() const override {

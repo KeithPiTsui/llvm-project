@@ -1,4 +1,4 @@
-;===- ./lib/Target/Cpu0/MCTargetDesc/LLVMBuild.txt -------------*- Conf -*--===;
+;===- ./lib/Target/LCC/MCTargetDesc/LLVMBuild.txt -------------*- Conf -*--===;
 ;
 ;                     The LLVM Compiler Infrastructure
 ;
@@ -17,10 +17,10 @@
 
 [component_0]
 type = Library
-name = Cpu0Desc
-parent = Cpu0
+name = LCCDesc
+parent = LCC
 required_libraries = MC 
-                     Cpu0Info 
+                     LCCInfo 
                      Support
-add_to_library_groups = Cpu0
+add_to_library_groups = LCC
 

@@ -1,4 +1,4 @@
-//===-- Cpu0MachineFunctionInfo.h - Private data used for Cpu0 ----*- C++ -*-=//
+//===-- LCCMachineFunctionInfo.h - Private data used for LCC ----*- C++ -*-=//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,14 +7,14 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file declares the Cpu0 specific subclass of MachineFunctionInfo.
+// This file declares the LCC specific subclass of MachineFunctionInfo.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0MACHINEFUNCTION_H
-#define LLVM_LIB_TARGET_CPU0_CPU0MACHINEFUNCTION_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCMACHINEFUNCTION_H
+#define LLVM_LIB_TARGET_LCC_LCCMACHINEFUNCTION_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
 #include "llvm/CodeGen/MachineFrameInfo.h"
 #include "llvm/CodeGen/MachineFunction.h"
@@ -27,14 +27,14 @@
 namespace llvm {
 
 //@1 {
-/// Cpu0FunctionInfo - This class is derived from MachineFunction private
-/// Cpu0 target-specific information for each MachineFunction.
-class Cpu0FunctionInfo : public MachineFunctionInfo {
+/// LCCFunctionInfo - This class is derived from MachineFunction private
+/// LCC target-specific information for each MachineFunction.
+class LCCFunctionInfo : public MachineFunctionInfo {
 public:
-  Cpu0FunctionInfo(MachineFunction &MF)
+  LCCFunctionInfo(MachineFunction &MF)
       : MF(MF), VarArgsFrameIndex(0), MaxCallFrameSize(0) {}
 
-  ~Cpu0FunctionInfo();
+  ~LCCFunctionInfo();
 
   int getVarArgsFrameIndex() const { return VarArgsFrameIndex; }
   void setVarArgsFrameIndex(int Index) { VarArgsFrameIndex = Index; }
@@ -53,4 +53,4 @@ private:
 
 } // end of namespace llvm
 
-#endif // CPU0_MACHINE_FUNCTION_INFO_H
+#endif // LCC_MACHINE_FUNCTION_INFO_H

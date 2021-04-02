@@ -1,4 +1,4 @@
-//===-- Cpu0.h - Top-level interface for Cpu0 representation ----*- C++ -*-===//
+//===-- LCC.h - Top-level interface for LCC representation ----*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -8,19 +8,19 @@
 //===----------------------------------------------------------------------===//
 //
 // This file contains the entry points for global functions defined in
-// the LLVM Cpu0 back-end.
+// the LLVM LCC back-end.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0_H
-#define LLVM_LIB_TARGET_CPU0_CPU0_H
+#ifndef LLVM_LIB_TARGET_LCC_LCC_H
+#define LLVM_LIB_TARGET_LCC_LCC_H
 
-#include "Cpu0Config.h"
-#include "MCTargetDesc/Cpu0MCTargetDesc.h"
+#include "LCCConfig.h"
+#include "MCTargetDesc/LCCMCTargetDesc.h"
 #include "llvm/Target/TargetMachine.h"
 
 namespace llvm {
-  class Cpu0TargetMachine;
+  class LCCTargetMachine;
   class FunctionPass;
 
 } // end namespace llvm;

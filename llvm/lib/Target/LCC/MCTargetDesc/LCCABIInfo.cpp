@@ -1,4 +1,4 @@
-//===---- Cpu0ABIInfo.cpp - Information about CPU0 ABI's ------------------===//
+//===---- LCCABIInfo.cpp - Information about LCC ABI's ------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,10 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0ABIInfo.h"
-#include "Cpu0RegisterInfo.h"
+#include "LCCABIInfo.h"
+#include "LCCRegisterInfo.h"
 #include "llvm/ADT/StringRef.h"
 #include "llvm/ADT/StringSwitch.h"
 #include "llvm/MC/MCTargetOptions.h"
@@ -19,16 +19,16 @@
 using namespace llvm;
 
 static cl::opt<bool>
-EnableCpu0S32Calls("cpu0-s32-calls", cl::Hidden,
-                    cl::desc("CPU0 S32 call: use stack only to pass arguments.\
+EnableLCCS32Calls("LCC-s32-calls", cl::Hidden,
+                    cl::desc("LCC S32 call: use stack only to pass arguments.\
                     "), cl::init(false));
 
 namespace {
-static const MCPhysReg O32IntRegs[4] = {Cpu0::A0, Cpu0::A1};
+static const MCPhysReg O32IntRegs[4] = {LCC::A0, LCC::A1};
 static const MCPhysReg S32IntRegs = {};
 }
 
-const ArrayRef<MCPhysReg> Cpu0ABIInfo::GetByValArgRegs() const {
+const ArrayRef<MCPhysReg> LCCABIInfo::GetByValArgRegs() const {
   if (IsO32())
     return makeArrayRef(O32IntRegs);
   if (IsS32())
@@ -36,7 +36,7 @@ const ArrayRef<MCPhysReg> Cpu0ABIInfo::GetByValArgRegs() const {
   llvm_unreachable("Unhandled ABI");
 }
 
-const ArrayRef<MCPhysReg> Cpu0ABIInfo::GetVarArgRegs() const {
+const ArrayRef<MCPhysReg> LCCABIInfo::GetVarArgRegs() const {
   if (IsO32())
     return makeArrayRef(O32IntRegs);
   if (IsS32())
@@ -44,7 +44,7 @@ const ArrayRef<MCPhysReg> Cpu0ABIInfo::GetVarArgRegs() const {
   llvm_unreachable("Unhandled ABI");
 }
 
-unsigned Cpu0ABIInfo::GetCalleeAllocdArgSizeInBytes(CallingConv::ID CC) const {
+unsigned LCCABIInfo::GetCalleeAllocdArgSizeInBytes(CallingConv::ID CC) const {
   if (IsO32())
     return CC != 0;
   if (IsS32())
@@ -52,10 +52,10 @@ unsigned Cpu0ABIInfo::GetCalleeAllocdArgSizeInBytes(CallingConv::ID CC) const {
   llvm_unreachable("Unhandled ABI");
 }
 
-Cpu0ABIInfo Cpu0ABIInfo::computeTargetABI() {
-  Cpu0ABIInfo abi(ABI::Unknown);
+LCCABIInfo LCCABIInfo::computeTargetABI() {
+  LCCABIInfo abi(ABI::Unknown);
 
-  if (EnableCpu0S32Calls)
+  if (EnableLCCS32Calls)
     abi = ABI::S32;
   else
     abi = ABI::O32;
@@ -65,27 +65,27 @@ Cpu0ABIInfo Cpu0ABIInfo::computeTargetABI() {
   return abi;
 }
 
-unsigned Cpu0ABIInfo::GetStackPtr() const {
-  return Cpu0::SP;
+unsigned LCCABIInfo::GetStackPtr() const {
+  return LCC::SP;
 }
 
-unsigned Cpu0ABIInfo::GetFramePtr() const {
-  return Cpu0::FP;
+unsigned LCCABIInfo::GetFramePtr() const {
+  return LCC::FP;
 }
 
-unsigned Cpu0ABIInfo::GetNullPtr() const {
-  return Cpu0::ZERO;
+unsigned LCCABIInfo::GetNullPtr() const {
+  return LCC::ZERO;
 }
 
-unsigned Cpu0ABIInfo::GetEhDataReg(unsigned I) const {
+unsigned LCCABIInfo::GetEhDataReg(unsigned I) const {
   static const unsigned EhDataReg[] = {
-    Cpu0::A0, Cpu0::A1
+    LCC::A0, LCC::A1
   };
 
   return EhDataReg[I];
 }
 
-int Cpu0ABIInfo::EhDataRegSize() const {
+int LCCABIInfo::EhDataRegSize() const {
   if (ThisABI == ABI::S32)
     return 0;
   else

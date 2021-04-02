@@ -1,4 +1,4 @@
-//===-- Cpu0MachineFunctionInfo.cpp - Private data used for Cpu0 ----------===//
+//===-- LCCMachineFunctionInfo.cpp - Private data used for LCC ----------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,10 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0MachineFunction.h"
+#include "LCCMachineFunction.h"
 
-#include "Cpu0InstrInfo.h"
-#include "Cpu0Subtarget.h"
+#include "LCCInstrInfo.h"
+#include "LCCSubtarget.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
 #include "llvm/IR/Function.h"
@@ -19,6 +19,6 @@ using namespace llvm;
 
 bool FixGlobalBaseReg;
 
-Cpu0FunctionInfo::~Cpu0FunctionInfo() {}
+LCCFunctionInfo::~LCCFunctionInfo() {}
 
-void Cpu0FunctionInfo::anchor() {}
+void LCCFunctionInfo::anchor() {}

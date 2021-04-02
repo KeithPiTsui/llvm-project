@@ -1,6 +1,6 @@
 //===-- LCCInstrFormats.td - LCC Instruction Formats -----*- tablegen -*-===//
 //===----------------------------------------------------------------------===//
-//  Describe CPU0 instructions format
+//  Describe LCC instructions format
 //  CPU INSTRUCTION FORMATS
 //  opcode  - operation code.
 //  ra      - dst reg, only used on 3 regs instr.

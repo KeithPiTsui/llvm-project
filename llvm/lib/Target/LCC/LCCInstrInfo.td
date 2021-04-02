@@ -69,7 +69,7 @@ def SUB: ArithLogic3Regs<0x01, "sub", sub, IIAlu, CPURegs, 1>;
 
 // Address operand
 def mem : Operand<iPTR> {
-// Making llvm call function Cpu0InstPrinter::printMemOperand()
+// Making llvm call function LCCInstPrinter::printMemOperand()
   let PrintMethod = "printMemOperand";
 // For example, ld $2, 4($sp), the mem operand is 4($sp):(ops CPURegs, simm16). 
   let MIOperandInfo = (ops CPURegs, simm16);
@@ -80,7 +80,7 @@ def mem : Operand<iPTR> {
 // As TableGen is unable to generate selection code for complex addressing modes,
 // selection of a MEMbol operand must be done manually. 
 // Reference https://opus4.kobv.de/opus4-fau/files/1108/tricore_llvm.pdf
-// Cpu0 Address Mode! SDNode frameindex could possibily be a match
+// LCC Address Mode! SDNode frameindex could possibily be a match
 // since load and store instructions from stack used it.
 def addr : 
   ComplexPattern<iPTR, 2, "SelectAddr", [frameindex], [SDNPWantParent]>;

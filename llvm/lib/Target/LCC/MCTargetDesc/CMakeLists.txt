@@ -1,6 +1,6 @@
 # MCTargetDesc/CMakeLists.txt
-add_llvm_library(LLVMCpu0Desc
-  Cpu0ABIInfo.cpp
-  Cpu0MCTargetDesc.cpp
+add_llvm_library(LLVMLCCDesc
+  LCCABIInfo.cpp
+  LCCMCTargetDesc.cpp
   )
 

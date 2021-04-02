@@ -1,4 +1,4 @@
-//===-- Cpu0RegisterInfo.h - Cpu0 Register Information Impl -----*- C++ -*-===//
+//===-- LCCRegisterInfo.h - LCC Register Information Impl -----*- C++ -*-===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,33 +7,33 @@
 //
 //===----------------------------------------------------------------------===//
 //
-// This file contains the Cpu0 implementation of the TargetRegisterInfo class.
+// This file contains the LCC implementation of the TargetRegisterInfo class.
 //
 //===----------------------------------------------------------------------===//
 
-#ifndef LLVM_LIB_TARGET_CPU0_CPU0REGISTERINFO_H
-#define LLVM_LIB_TARGET_CPU0_CPU0REGISTERINFO_H
+#ifndef LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
+#define LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 
-#include "Cpu0Config.h"
+#include "LCCConfig.h"
 
-#include "Cpu0.h"
+#include "LCC.h"
 #include "llvm/CodeGen/Register.h"
 #include "llvm/CodeGen/TargetRegisterInfo.h"
 
 #define GET_REGINFO_HEADER
-#include "Cpu0GenRegisterInfo.inc"
+#include "LCCGenRegisterInfo.inc"
 
 namespace llvm {
-class Cpu0Subtarget;
+class LCCSubtarget;
 class TargetInstrInfo;
 class Type;
 
-class Cpu0RegisterInfo : public Cpu0GenRegisterInfo {
+class LCCRegisterInfo : public LCCGenRegisterInfo {
 protected:
-  const Cpu0Subtarget &Subtarget;
+  const LCCSubtarget &Subtarget;
 
 public:
-  Cpu0RegisterInfo(const Cpu0Subtarget &Subtarget);
+  LCCRegisterInfo(const LCCSubtarget &Subtarget);
 
   const MCPhysReg *getCalleeSavedRegs(const MachineFunction *MF) const override;
 

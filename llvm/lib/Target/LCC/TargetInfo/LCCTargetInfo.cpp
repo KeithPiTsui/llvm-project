@@ -1,4 +1,4 @@
-//===-- Cpu0TargetInfo.cpp - Cpu0 Target Implementation -------------------===//
+//===-- LCCTargetInfo.cpp - LCC Target Implementation -------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,18 +7,18 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0.h"
+#include "LCC.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/TargetRegistry.h"
 using namespace llvm;
 
-Target llvm::TheCpu0Target, llvm::TheCpu0elTarget;
+Target llvm::TheLCCTarget, llvm::TheLCCelTarget;
 
-extern "C" void LLVMInitializeCpu0TargetInfo() {
-  RegisterTarget<Triple::cpu0,
-                 /*HasJIT=*/true> X(TheCpu0Target, "cpu0", "Cpu0", "Cpu0");
+extern "C" void LLVMInitializeLCCTargetInfo() {
+  RegisterTarget<Triple::LCC,
+                 /*HasJIT=*/true> X(TheLCCTarget, "LCC", "LCC", "LCC");
 
-  RegisterTarget<Triple::cpu0el,
-                 /*HasJIT=*/true> Y(TheCpu0elTarget, "cpu0el", "Cpu0el", "Cpu0el");
+  RegisterTarget<Triple::LCCel,
+                 /*HasJIT=*/true> Y(TheLCCelTarget, "LCCel", "LCCel", "LCCel");
 }
 

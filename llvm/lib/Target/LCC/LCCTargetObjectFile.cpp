@@ -1,4 +1,4 @@
-//===-- Cpu0TargetObjectFile.cpp - Cpu0 Object Files ----------------------===//
+//===-- LCCTargetObjectFile.cpp - LCC Object Files ----------------------===//
 //
 //                     The LLVM Compiler Infrastructure
 //
@@ -7,10 +7,10 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "Cpu0TargetObjectFile.h"
+#include "LCCTargetObjectFile.h"
 
-#include "Cpu0Subtarget.h"
-#include "Cpu0TargetMachine.h"
+#include "LCCSubtarget.h"
+#include "LCCTargetMachine.h"
 #include "llvm/BinaryFormat/ELF.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -22,11 +22,11 @@
 using namespace llvm;
 
 static cl::opt<unsigned> SSThreshold(
-    "cpu0-ssection-threshold", cl::Hidden,
+    "LCC-ssection-threshold", cl::Hidden,
     cl::desc("Small data and bss section threshold size (default=8)"),
     cl::init(8));
 
-void Cpu0TargetObjectFile::Initialize(MCContext &Ctx, const TargetMachine &TM) {
+void LCCTargetObjectFile::Initialize(MCContext &Ctx, const TargetMachine &TM) {
   TargetLoweringObjectFileELF::Initialize(Ctx, TM);
   InitializeELF(TM.Options.UseInitArray);
 
@@ -35,5 +35,5 @@ void Cpu0TargetObjectFile::Initialize(MCContext &Ctx, const TargetMachine &TM) {
 
   SmallBSSSection = getContext().getELFSection(".sbss", ELF::SHT_NOBITS,
                                                ELF::SHF_WRITE | ELF::SHF_ALLOC);
-  this->TM = &static_cast<const Cpu0TargetMachine &>(TM);
+  this->TM = &static_cast<const LCCTargetMachine &>(TM);
 }
