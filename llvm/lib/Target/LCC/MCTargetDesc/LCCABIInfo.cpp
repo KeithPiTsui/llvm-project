@@ -24,7 +24,7 @@ EnableLCCS32Calls("LCC-s32-calls", cl::Hidden,
                     "), cl::init(false));
 
 namespace {
-static const MCPhysReg O32IntRegs[4] = {LCC::A0, LCC::A1};
+static const MCPhysReg O32IntRegs = {};
 static const MCPhysReg S32IntRegs = {};
 }
 
@@ -73,15 +73,12 @@ unsigned LCCABIInfo::GetFramePtr() const {
   return LCC::FP;
 }
 
-unsigned LCCABIInfo::GetNullPtr() const {
-  return LCC::ZERO;
-}
+// unsigned LCCABIInfo::GetNullPtr() const {
+//   return LCC::ZERO;
+// }
 
 unsigned LCCABIInfo::GetEhDataReg(unsigned I) const {
-  static const unsigned EhDataReg[] = {
-    LCC::A0, LCC::A1
-  };
-
+  static const unsigned EhDataReg[] = {};
   return EhDataReg[I];
 }
 

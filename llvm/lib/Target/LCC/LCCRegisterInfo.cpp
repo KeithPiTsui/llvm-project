@@ -13,11 +13,9 @@
 
 #include "llvm/CodeGen/Register.h"
 #define DEBUG_TYPE "LCC-reg-info"
-
-#include "LCCRegisterInfo.h"
-
 #include "LCC.h"
 #include "LCCMachineFunction.h"
+#include "LCCRegisterInfo.h"
 #include "LCCSubtarget.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Type.h"
@@ -44,26 +42,22 @@ LCCRegisterInfo::LCCRegisterInfo(const LCCSubtarget &ST)
 // llc create CSR_O32_SaveList and CSR_O32_RegMask from above defined.
 const MCPhysReg *
 LCCRegisterInfo::getCalleeSavedRegs(const MachineFunction *MF) const {
-  return CSR_O32_SaveList;
+  return CSR_O16_SaveList;
 }
 
-const uint32_t *
-LCCRegisterInfo::getCallPreservedMask(const MachineFunction &MF,
-                                       CallingConv::ID) const {
-  return CSR_O32_RegMask;
+const uint32_t *LCCRegisterInfo::getCallPreservedMask(const MachineFunction &MF,
+                                                      CallingConv::ID) const {
+  return CSR_O16_RegMask;
 }
 
 // pure virtual method
 //@getReservedRegs {
 BitVector LCCRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
   //@getReservedRegs body {
-  static const uint16_t ReservedCPURegs[] = {LCC::ZERO, LCC::AT, LCC::SP,
-                                             LCC::LR, LCC::PC};
+  static const uint16_t ReservedCPURegs[] = {LCC::SP, LCC::LR};
   BitVector Reserved(getNumRegs());
-
   for (unsigned I = 0; I < array_lengthof(ReservedCPURegs); ++I)
     Reserved.set(ReservedCPURegs[I]);
-
   return Reserved;
 }
 
@@ -74,8 +68,8 @@ BitVector LCCRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
 // We must replace FrameIndex with an stack/frame pointer
 // direct reference.
 void LCCRegisterInfo::eliminateFrameIndex(MachineBasicBlock::iterator II,
-                                           int SPAdj, unsigned FIOperandNum,
-                                           RegScavenger *RS) const {}
+                                          int SPAdj, unsigned FIOperandNum,
+                                          RegScavenger *RS) const {}
 //}
 
 bool LCCRegisterInfo::requiresRegisterScavenging(

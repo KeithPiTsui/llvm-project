@@ -24,8 +24,7 @@ using namespace llvm;
 #define DEBUG_TYPE "LCC"
 
 extern "C" void LLVMInitializeLCCTarget() {
-  RegisterTargetMachine<LCCebTargetMachine> X(TheLCCTarget);
-  RegisterTargetMachine<LCCelTargetMachine> Y(TheLCCelTarget);
+  RegisterTargetMachine<LCCelTargetMachine> X(TheLCCTarget);
 }
 
 static std::string computeDataLayout(const Triple &TT, StringRef CPU,

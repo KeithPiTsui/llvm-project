@@ -12,11 +12,9 @@
 //===----------------------------------------------------------------------===//
 
 #include "LCCSubtarget.h"
-
 #include "LCC.h"
 #include "LCCMachineFunction.h"
 #include "LCCRegisterInfo.h"
-
 #include "LCCTargetMachine.h"
 #include "llvm/IR/Attributes.h"
 #include "llvm/IR/Function.h"
@@ -38,8 +36,8 @@ void LCCSubtarget::anchor() {}
 
 //@1 {
 LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
-                             const std::string &FS, bool little,
-                             const LCCTargetMachine &_TM)
+                           const std::string &FS, bool little,
+                           const LCCTargetMachine &_TM)
     : //@1 }
       // LCCGenSubtargetInfo will display features by llc -march=LCC
       // -mcpu=help
@@ -56,9 +54,8 @@ bool LCCSubtarget::isPositionIndependent() const {
 
 LCCSubtarget &
 LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
-                                               const TargetMachine &TM) {
-  if (TargetTriple.getArch() == Triple::LCC ||
-      TargetTriple.getArch() == Triple::LCCel) {
+                                              const TargetMachine &TM) {
+  if (TargetTriple.getArch() == Triple::LCC) {
     if (CPU.empty() || CPU == "generic") {
       CPU = "LCC32II";
     } else if (CPU == "help") {
@@ -88,18 +85,11 @@ LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
     errs() << "-mcpu must be empty(default:LCC32II), LCC32I or LCC32II"
            << "\n";
   }
-
-  // Parse features string.
   ParseSubtargetFeatures(CPU, FS);
-  // Initialize scheduling itinerary for the specified CPU.
   InstrItins = getInstrItineraryForCPU(CPU);
-
   return *this;
 }
 
-bool LCCSubtarget::abiUsesSoftFloat() const {
-  //  return TM->Options.UseSoftFloat;
-  return true;
-}
+bool LCCSubtarget::abiUsesSoftFloat() const { return true; }
 
 const LCCABIInfo &LCCSubtarget::getABI() const { return TM.getABI(); }
