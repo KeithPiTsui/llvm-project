@@ -39,8 +39,6 @@ LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
                            const std::string &FS, bool little,
                            const LCCTargetMachine &_TM)
     : //@1 }
-      // LCCGenSubtargetInfo will display features by llc -march=LCC
-      // -mcpu=help
       LCCGenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
       TargetTriple(TT), TSInfo(),
       InstrInfo(
