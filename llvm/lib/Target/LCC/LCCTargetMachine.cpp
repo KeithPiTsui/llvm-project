@@ -32,25 +32,18 @@ static std::string computeDataLayout(const Triple &TT, StringRef CPU,
                                      const TargetOptions &Options,
                                      bool isLittle) {
   std::string Ret = "";
-  // There are both little and big endian LCC.
-  if (isLittle)
-    Ret += "e";
-  else
-    Ret += "E";
-
-  Ret += "-m:m";
-
-  // Pointers are 32 bit on some ABIs.
-  Ret += "-p:32:32";
-
-  // 8 and 16 bit integers only need to have natural alignment, but try to
-  // align them to 32 bits. 64 bit integers have natural alignment.
-  Ret += "-i8:8:32-i16:16:32-i64:64";
-
-  // 32 bit registers are always available and the stack is at least 64 bit
-  // aligned.
-  Ret += "-n32-S64";
-
+  // Little endian
+  Ret += isLittle ? "e" : "E";
+  // Mangling Mode is ELF
+  Ret += "-m:e";
+  // Pointers are 16 bit on some ABIs.
+  Ret += "-p16:16:16";
+  // Integer and float point size
+  Ret += "-i8:16:16-i16:16:16-i32:16-i64:16-f32:16-f64:16";
+  // Aggregate size
+  Ret += "-a:16";
+  // Native Integer Types and Stack Natural Aligment
+  Ret += "-n16-S16";
   return Ret;
 }
 

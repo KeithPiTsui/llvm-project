@@ -10,6 +10,10 @@ if ("${CMAKE_VERSION}" VERSION_LESS "3.13.4")
     "at least 3.13.4 now to avoid issues in the future!")
 endif()
 
+if(POLICY CMP0116)
+  cmake_policy(SET CMP0116 OLD)
+endif()
+
 if(POLICY CMP0068)
   cmake_policy(SET CMP0068 NEW)
   set(CMAKE_BUILD_WITH_INSTALL_NAME_DIR ON)
