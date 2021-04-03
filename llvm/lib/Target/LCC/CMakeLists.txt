@@ -1,4 +1,4 @@
-set(LLVM_TARGET_DEFINITIONS LCC.td)
+set(LLVM_TARGET_DEFINITIONS Tablegen/LCC.td)
 
 tablegen(LLVM LCCGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM LCCGenInstrInfo.inc -gen-instr-info)

@@ -6,13 +6,13 @@ include "llvm/Target/Target.td"
 //===----------------------------------------------------------------------===//
 // Target-dependent interfaces
 //===----------------------------------------------------------------------===//
-include "LCCRegisterInfo.td"
+include "Tablegen/LCCRegisterInfo.td"
 //===----------------------------------------------------------------------===//
 // Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//
-include "LCCSchedule.td"
-include "LCCInstrInfo.td"
-include "LCCCallingConv.td"
+include "Tablegen/LCCSchedule.td"
+include "Tablegen/LCCInstrInfo.td"
+include "Tablegen/LCCCallingConv.td"
 //===----------------------------------------------------------------------===//
 // LCC processors supported.
 //===----------------------------------------------------------------------===//
