@@ -15,8 +15,6 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCISELLOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCISELLOWERING_H
 
-
-
 #include "LCC.h"
 #include "MCTargetDesc/LCCABIInfo.h"
 #include "llvm/CodeGen/CallingConvLower.h"
@@ -76,10 +74,10 @@ class LCCSubtarget;
 class LCCTargetLowering : public TargetLowering {
 public:
   explicit LCCTargetLowering(const LCCTargetMachine &TM,
-                              const LCCSubtarget &STI);
+                             const LCCSubtarget &STI);
 
   static const LCCTargetLowering *create(const LCCTargetMachine &TM,
-                                          const LCCSubtarget &STI);
+                                         const LCCSubtarget &STI);
 
   /// getTargetNodeName - This method returns the name of a target specific
   //  DAG node.
@@ -103,7 +101,7 @@ protected:
     enum SpecialCallingConvType { NoSpecialCallingConv };
 
     LCCCC(CallingConv::ID CallConv, bool IsO32, CCState &Info,
-           SpecialCallingConvType SpecialCallingConv = NoSpecialCallingConv);
+          SpecialCallingConvType SpecialCallingConv = NoSpecialCallingConv);
 
     void analyzeCallResult(const SmallVectorImpl<ISD::InputArg> &Ins,
                            bool IsSoftFloat, const SDNode *CallNode,
@@ -166,9 +164,8 @@ private:
                       const SmallVectorImpl<SDValue> &OutVals, const SDLoc &dl,
                       SelectionDAG &DAG) const override;
 };
-const LCCTargetLowering *
-createLCCSETargetLowering(const LCCTargetMachine &TM,
-                           const LCCSubtarget &STI);
+const LCCTargetLowering *createLCCSETargetLowering(const LCCTargetMachine &TM,
+                                                   const LCCSubtarget &STI);
 } // namespace llvm
 
 #endif // LCCISELLOWERING_H

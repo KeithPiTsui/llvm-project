@@ -7,8 +7,6 @@
 //
 //===----------------------------------------------------------------------===//
 
-
-
 #include "LCCABIInfo.h"
 #include "LCCRegisterInfo.h"
 #include "llvm/ADT/StringRef.h"
@@ -19,14 +17,15 @@
 using namespace llvm;
 
 static cl::opt<bool>
-EnableLCCS32Calls("LCC-s32-calls", cl::Hidden,
-                    cl::desc("LCC S32 call: use stack only to pass arguments.\
-                    "), cl::init(false));
+    EnableLCCS32Calls("LCC-s32-calls", cl::Hidden,
+                      cl::desc("LCC S32 call: use stack only to pass arguments.\
+                    "),
+                      cl::init(false));
 
 namespace {
-static const MCPhysReg O32IntRegs[4] = {LCC::A0, LCC::A1};
+static const MCPhysReg O32IntRegs = {};
 static const MCPhysReg S32IntRegs = {};
-}
+} // namespace
 
 const ArrayRef<MCPhysReg> LCCABIInfo::GetByValArgRegs() const {
   if (IsO32())
@@ -65,22 +64,14 @@ LCCABIInfo LCCABIInfo::computeTargetABI() {
   return abi;
 }
 
-unsigned LCCABIInfo::GetStackPtr() const {
-  return LCC::SP;
-}
+unsigned LCCABIInfo::GetStackPtr() const { return LCC::SP; }
 
-unsigned LCCABIInfo::GetFramePtr() const {
-  return LCC::FP;
-}
+unsigned LCCABIInfo::GetFramePtr() const { return LCC::FP; }
 
-unsigned LCCABIInfo::GetNullPtr() const {
-  return LCC::ZERO;
-}
+//unsigned LCCABIInfo::GetNullPtr() const { return LCC::ZERO; }
 
 unsigned LCCABIInfo::GetEhDataReg(unsigned I) const {
-  static const unsigned EhDataReg[] = {
-    LCC::A0, LCC::A1
-  };
+  static const unsigned EhDataReg[] = {};
 
   return EhDataReg[I];
 }
@@ -91,4 +82,3 @@ int LCCABIInfo::EhDataRegSize() const {
   else
     return 2;
 }
-

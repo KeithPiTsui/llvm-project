@@ -8,6 +8,7 @@
 //===----------------------------------------------------------------------===//
 #include "LCCAnalyzeImmediate.h"
 #include "LCC.h"
+#include "MCTargetDesc/LCCMCTargetDesc.h"
 #if CH >= CH3_5
 
 #include "llvm/Support/MathExtras.h"
@@ -29,26 +30,26 @@ void LCCAnalyzeImmediate::AddInstr(InstSeqLs &SeqLs, const Inst &I) {
 }
 
 void LCCAnalyzeImmediate::GetInstSeqLsADDiu(uint64_t Imm, unsigned RemSize,
-                                             InstSeqLs &SeqLs) {
+                                            InstSeqLs &SeqLs) {
   GetInstSeqLs((Imm + 0x8000ULL) & 0xffffffffffff0000ULL, RemSize, SeqLs);
   AddInstr(SeqLs, Inst(ADDiu, Imm & 0xffffULL));
 }
 
 void LCCAnalyzeImmediate::GetInstSeqLsORi(uint64_t Imm, unsigned RemSize,
-                                           InstSeqLs &SeqLs) {
+                                          InstSeqLs &SeqLs) {
   GetInstSeqLs(Imm & 0xffffffffffff0000ULL, RemSize, SeqLs);
   AddInstr(SeqLs, Inst(ORi, Imm & 0xffffULL));
 }
 
 void LCCAnalyzeImmediate::GetInstSeqLsSHL(uint64_t Imm, unsigned RemSize,
-                                           InstSeqLs &SeqLs) {
+                                          InstSeqLs &SeqLs) {
   unsigned Shamt = countTrailingZeros(Imm);
   GetInstSeqLs(Imm >> Shamt, RemSize - Shamt, SeqLs);
   AddInstr(SeqLs, Inst(SHL, Shamt));
 }
 
 void LCCAnalyzeImmediate::GetInstSeqLs(uint64_t Imm, unsigned RemSize,
-                                        InstSeqLs &SeqLs) {
+                                       InstSeqLs &SeqLs) {
   uint64_t MaskedImm = Imm & (0xffffffffffffffffULL >> (64 - Size));
 
   // Do nothing if Imm is 0.
@@ -125,13 +126,14 @@ void LCCAnalyzeImmediate::GetShortestSeq(InstSeqLs &SeqLs, InstSeq &Insts) {
 
 const LCCAnalyzeImmediate::InstSeq &
 LCCAnalyzeImmediate::Analyze(uint64_t Imm, unsigned Size,
-                              bool LastInstrIsADDiu) {
+                             bool LastInstrIsADDiu) {
   this->Size = Size;
 
-  ADDiu = LCC::ADDiu;
-  ORi = LCC::ORi;
-  SHL = LCC::SHL;
-  LUi = LCC::LUi;
+  // fixme
+  ADDiu = LCC::ADDi;
+  ORi = LCC::ADDi;
+  SHL = LCC::SLL;
+  LUi = LCC::ADDi;
 
   InstSeqLs SeqLs;
 

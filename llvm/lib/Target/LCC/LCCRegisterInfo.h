@@ -14,7 +14,6 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 #define LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 
-
 #include "LCC.h"
 #include "llvm/CodeGen/Register.h"
 #include "llvm/CodeGen/TargetRegisterInfo.h"
@@ -46,8 +45,8 @@ public:
   bool trackLivenessAfterRegAlloc(const MachineFunction &MF) const override;
 
   /// Stack Frame Processing Methods
-  void eliminateFrameIndex(MachineBasicBlock::iterator II,
-                           int SPAdj, unsigned FIOperandNum,
+  void eliminateFrameIndex(MachineBasicBlock::iterator II, int SPAdj,
+                           unsigned FIOperandNum,
                            RegScavenger *RS = nullptr) const override;
 
   /// Debug information queries.
@@ -60,4 +59,3 @@ public:
 } // end namespace llvm
 
 #endif
-

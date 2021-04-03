@@ -251,7 +251,7 @@ void LCCAsmPrinter::emitStartOfAsmFile(Module &M) {
 }
 
 void LCCAsmPrinter::printDebugValueComment(const MachineInstr *MI,
-                                            raw_ostream &OS) {
+                                           raw_ostream &OS) {
   // TODO: implement
   OS << "PrintDebugValueComment()";
 }
@@ -259,5 +259,4 @@ void LCCAsmPrinter::printDebugValueComment(const MachineInstr *MI,
 // Force static initialization.
 extern "C" void LLVMInitializeLCCAsmPrinter() {
   RegisterAsmPrinter<LCCAsmPrinter> X(TheLCCTarget);
-  RegisterAsmPrinter<LCCAsmPrinter> Y(TheLCCelTarget);
 }

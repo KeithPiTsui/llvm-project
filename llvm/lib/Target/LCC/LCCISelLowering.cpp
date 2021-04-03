@@ -12,7 +12,6 @@
 //
 //===----------------------------------------------------------------------===//
 #include "LCCISelLowering.h"
-
 #include "LCCMachineFunction.h"
 #include "LCCSubtarget.h"
 #include "LCCTargetMachine.h"
@@ -37,7 +36,6 @@ using namespace llvm;
 
 #define DEBUG_TYPE "LCC-lower"
 
-//@3_1 1 {
 const char *LCCTargetLowering::getTargetNodeName(unsigned Opcode) const {
   switch (Opcode) {
   case LCCISD::JmpLink:
@@ -64,47 +62,16 @@ const char *LCCTargetLowering::getTargetNodeName(unsigned Opcode) const {
     return NULL;
   }
 }
-//@3_1 1 }
-
-//@LCCTargetLowering {
 LCCTargetLowering::LCCTargetLowering(const LCCTargetMachine &TM,
-                                       const LCCSubtarget &STI)
+                                     const LCCSubtarget &STI)
     : TargetLowering(TM), Subtarget(STI), ABI(TM.getABI()) {
-  //- Set .align 2
-  // It will emit .align 2 later
   setMinFunctionAlignment(Align(2));
-
-  // must, computeRegisterProperties - Once all of the register classes are
-  //  added, this allows us to compute derived properties we expose.
-  // computeRegisterProperties(STI.getRegisterInfo());
 }
 
-// LCCTargetLowering::LCCTargetLowering(LCCTargetMachine &TM)
-//     : TargetLowering(TM, new LCCTargetObjectFile()),
-//       Subtarget(&TM.getSubtarget<LCCSubtarget>()) {
-
-//   //- Set .align 2
-//   // It will emit .align 2 later
-//   setMinFunctionAlignment(2);
-
-//   // must, computeRegisterProperties - Once all of the register classes are
-//   //  added, this allows us to compute derived properties we expose.
-//   computeRegisterProperties();
-// }
-
-const LCCTargetLowering *
-LCCTargetLowering::create(const LCCTargetMachine &TM,
-                           const LCCSubtarget &STI) {
+const LCCTargetLowering *LCCTargetLowering::create(const LCCTargetMachine &TM,
+                                                   const LCCSubtarget &STI) {
   return llvm::createLCCSETargetLowering(TM, STI);
 }
-
-//===----------------------------------------------------------------------===//
-//  Lower helper functions
-//===----------------------------------------------------------------------===//
-
-//===----------------------------------------------------------------------===//
-//  Misc Lower Operation implementation
-//===----------------------------------------------------------------------===//
 
 #include "LCCGenCallingConv.inc"
 
@@ -130,10 +97,10 @@ SDValue LCCTargetLowering::LowerFormalArguments(
 
 SDValue
 LCCTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
-                                bool IsVarArg,
-                                const SmallVectorImpl<ISD::OutputArg> &Outs,
-                                const SmallVectorImpl<SDValue> &OutVals,
-                                const SDLoc &DL, SelectionDAG &DAG) const {
+                               bool IsVarArg,
+                               const SmallVectorImpl<ISD::OutputArg> &Outs,
+                               const SmallVectorImpl<SDValue> &OutVals,
+                               const SDLoc &DL, SelectionDAG &DAG) const {
   // CCValAssign - represent the assignment of
   // the return value to a location
   SmallVector<CCValAssign, 16> RVLocs;
@@ -145,7 +112,7 @@ LCCTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
 
   // Analyze return values.
   LCCCCInfo.analyzeReturn(Outs, Subtarget.abiUsesSoftFloat(),
-                           MF.getFunction().getReturnType());
+                          MF.getFunction().getReturnType());
 
   SDValue Flag;
   SmallVector<SDValue, 4> RetOps(1, Chain);
@@ -179,7 +146,9 @@ LCCTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
       llvm_unreachable("sret virtual register not created in the entry block");
     SDValue Val =
         DAG.getCopyFromReg(Chain, DL, Reg, getPointerTy(DAG.getDataLayout()));
-    unsigned V0 = LCC::V0;
+
+    // fixme
+    unsigned V0 = LCC::R0;
 
     Chain = DAG.getCopyToReg(Chain, DL, V0, Val, Flag);
     Flag = Chain.getValue(1);
@@ -206,9 +175,10 @@ LCCTargetLowering::LCCCC::LCCCC(
 }
 
 template <typename Ty>
-void LCCTargetLowering::LCCCC::analyzeReturn(
-    const SmallVectorImpl<Ty> &RetVals, bool IsSoftFloat,
-    const SDNode *CallNode, const Type *RetTy) const {
+void LCCTargetLowering::LCCCC::analyzeReturn(const SmallVectorImpl<Ty> &RetVals,
+                                             bool IsSoftFloat,
+                                             const SDNode *CallNode,
+                                             const Type *RetTy) const {
   CCAssignFn *Fn;
 
   Fn = RetCC_LCC;
@@ -245,8 +215,8 @@ unsigned LCCTargetLowering::LCCCC::reservedArgArea() const {
 }
 
 MVT LCCTargetLowering::LCCCC::getRegVT(MVT VT, const Type *OrigTy,
-                                         const SDNode *CallNode,
-                                         bool IsSoftFloat) const {
+                                       const SDNode *CallNode,
+                                       bool IsSoftFloat) const {
   if (IsSoftFloat || IsO32)
     return VT;
 

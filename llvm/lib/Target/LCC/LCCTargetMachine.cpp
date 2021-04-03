@@ -25,13 +25,8 @@
 using namespace llvm;
 
 #define DEBUG_TYPE "LCC"
-
 extern "C" void LLVMInitializeLCCTarget() {
-  // Register the target.
-  //- Big endian Target Machine
-  RegisterTargetMachine<LCCebTargetMachine> X(TheLCCTarget);
-  //- Little endian Target Machine
-  RegisterTargetMachine<LCCelTargetMachine> Y(TheLCCelTarget);
+  RegisterTargetMachine<LCCelTargetMachine> X(TheLCCTarget);
 }
 
 static std::string computeDataLayout(const Triple &TT, StringRef CPU,
@@ -69,12 +64,12 @@ static Reloc::Model getEffectiveRelocModel(bool JIT,
 // an easier handling.
 // Using CodeModel::Large enables different CALL behavior.
 LCCTargetMachine::LCCTargetMachine(const Target &T, const Triple &TT,
-                                     StringRef CPU, StringRef FS,
-                                     const TargetOptions &Options,
-                                     Optional<Reloc::Model> RM,
-                                     Optional<CodeModel::Model> CM,
-                                     CodeGenOpt::Level OL, bool JIT,
-                                     bool isLittle)
+                                   StringRef CPU, StringRef FS,
+                                   const TargetOptions &Options,
+                                   Optional<Reloc::Model> RM,
+                                   Optional<CodeModel::Model> CM,
+                                   CodeGenOpt::Level OL, bool JIT,
+                                   bool isLittle)
     : LLVMTargetMachine(T, computeDataLayout(TT, CPU, Options, isLittle), TT,
                         CPU, FS, Options, getEffectiveRelocModel(JIT, RM),
                         getEffectiveCodeModel(CM, CodeModel::Small), OL),
@@ -87,19 +82,19 @@ LCCTargetMachine::LCCTargetMachine(const Target &T, const Triple &TT,
 LCCTargetMachine::~LCCTargetMachine() {}
 void LCCebTargetMachine::anchor() {}
 LCCebTargetMachine::LCCebTargetMachine(const Target &T, const Triple &TT,
-                                         StringRef CPU, StringRef FS,
-                                         const TargetOptions &Options,
-                                         Optional<Reloc::Model> RM,
-                                         Optional<CodeModel::Model> CM,
-                                         CodeGenOpt::Level OL, bool JIT)
+                                       StringRef CPU, StringRef FS,
+                                       const TargetOptions &Options,
+                                       Optional<Reloc::Model> RM,
+                                       Optional<CodeModel::Model> CM,
+                                       CodeGenOpt::Level OL, bool JIT)
     : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, false) {}
 void LCCelTargetMachine::anchor() {}
 LCCelTargetMachine::LCCelTargetMachine(const Target &T, const Triple &TT,
-                                         StringRef CPU, StringRef FS,
-                                         const TargetOptions &Options,
-                                         Optional<Reloc::Model> RM,
-                                         Optional<CodeModel::Model> CM,
-                                         CodeGenOpt::Level OL, bool JIT)
+                                       StringRef CPU, StringRef FS,
+                                       const TargetOptions &Options,
+                                       Optional<Reloc::Model> RM,
+                                       Optional<CodeModel::Model> CM,
+                                       CodeGenOpt::Level OL, bool JIT)
     : LCCTargetMachine(T, TT, CPU, FS, Options, RM, CM, OL, JIT, true) {}
 
 const LCCSubtarget *

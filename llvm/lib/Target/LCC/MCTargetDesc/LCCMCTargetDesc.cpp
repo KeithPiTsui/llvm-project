@@ -45,7 +45,7 @@ using namespace llvm;
 static std::string selectLCCArchFeature(const Triple &TT, StringRef CPU) {
   std::string LCCArchFeature;
   if (CPU.empty() || CPU == "generic") {
-    if (TT.getArch() == Triple::LCC || TT.getArch() == Triple::LCCel) {
+    if (TT.getArch() == Triple::LCC) {
       if (CPU.empty() || CPU == "LCC32II") {
         LCCArchFeature = "+LCC32II";
       } else {
@@ -67,12 +67,13 @@ static MCInstrInfo *createLCCMCInstrInfo() {
 
 static MCRegisterInfo *createLCCMCRegisterInfo(const Triple &TT) {
   MCRegisterInfo *X = new MCRegisterInfo();
-  InitLCCMCRegisterInfo(X, LCC::SW); // defined in LCCGenRegisterInfo.inc
+  // fixme
+  InitLCCMCRegisterInfo(X, LCC::R0); // defined in LCCGenRegisterInfo.inc
   return X;
 }
 
 static MCSubtargetInfo *createLCCMCSubtargetInfo(const Triple &TT,
-                                                  StringRef CPU, StringRef FS) {
+                                                 StringRef CPU, StringRef FS) {
   std::string ArchFS = selectLCCArchFeature(TT, CPU);
   if (!FS.empty()) {
     if (!ArchFS.empty())
@@ -85,8 +86,8 @@ static MCSubtargetInfo *createLCCMCSubtargetInfo(const Triple &TT,
 }
 
 static MCAsmInfo *createLCCMCAsmInfo(const MCRegisterInfo &MRI,
-                                      const Triple &TT,
-                                      const MCTargetOptions &Options) {
+                                     const Triple &TT,
+                                     const MCTargetOptions &Options) {
   MCAsmInfo *MAI = new LCCMCAsmInfo(TT);
   unsigned SP = MRI.getDwarfRegNum(LCC::SP, true);
   MCCFIInstruction Inst = MCCFIInstruction::createDefCfaRegister(nullptr, SP);
@@ -95,10 +96,10 @@ static MCAsmInfo *createLCCMCAsmInfo(const MCRegisterInfo &MRI,
 }
 
 static MCInstPrinter *createLCCMCInstPrinter(const Triple &T,
-                                              unsigned SyntaxVariant,
-                                              const MCAsmInfo &MAI,
-                                              const MCInstrInfo &MII,
-                                              const MCRegisterInfo &MRI) {
+                                             unsigned SyntaxVariant,
+                                             const MCAsmInfo &MAI,
+                                             const MCInstrInfo &MII,
+                                             const MCRegisterInfo &MRI) {
   return new LCCInstPrinter(MAI, MII, MRI);
 }
 
@@ -116,7 +117,7 @@ static MCInstrAnalysis *createLCCMCInstrAnalysis(const MCInstrInfo *Info) {
 
 //@2 {
 extern "C" void LLVMInitializeLCCTargetMC() {
-  for (Target *T : {&TheLCCTarget, &TheLCCelTarget}) {
+  for (Target *T : {&TheLCCTarget}) {
     // Register the MC asm info.
     TargetRegistry::RegisterMCAsmInfo(*T, createLCCMCAsmInfo);
     // Register the MC instruction info.

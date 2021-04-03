@@ -10,8 +10,6 @@
 #ifndef LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
 #define LLVM_LIB_TARGET_LCC_MCTARGETDESC_LCCABIINFO_H
 
-
-
 #include "llvm/ADT/ArrayRef.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/IR/CallingConv.h"
@@ -62,12 +60,11 @@ public:
 
   unsigned GetStackPtr() const;
   unsigned GetFramePtr() const;
-  unsigned GetNullPtr() const;
+  //  unsigned GetNullPtr() const;
 
   unsigned GetEhDataReg(unsigned I) const;
   int EhDataRegSize() const;
 };
-}
+} // namespace llvm
 
 #endif
-

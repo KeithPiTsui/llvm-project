@@ -14,8 +14,6 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCISELDAGTODAG_H
 #define LLVM_LIB_TARGET_LCC_LCCISELDAGTODAG_H
 
-
-
 #include "LCC.h"
 #include "LCCSubtarget.h"
 #include "LCCTargetMachine.h"

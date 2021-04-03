@@ -44,7 +44,7 @@ unsigned LCCInstrInfo::GetInstSizeInBytes(const MachineInstr &MI) const {
 
 MachineMemOperand *
 LCCInstrInfo::GetMemOperand(MachineBasicBlock &MBB, int FI,
-                             MachineMemOperand::Flags Flags) const {
+                            MachineMemOperand::Flags Flags) const {
   MachineFunction &MF = *MBB.getParent();
   MachineFrameInfo &MFI = MF.getFrameInfo();
   unsigned align = MFI.getObjectAlignment(FI);

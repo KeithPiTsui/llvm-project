@@ -23,6 +23,7 @@
 #include "llvm/Support/TargetRegistry.h"
 
 #include "LCCAnalyzeImmediate.h"
+#include "MCTargetDesc/LCCMCTargetDesc.h"
 
 using namespace llvm;
 
@@ -50,7 +51,7 @@ bool LCCSEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
 }
 
 void LCCSEInstrInfo::expandRetLR(MachineBasicBlock &MBB,
-                                  MachineBasicBlock::iterator I) const {
+                                 MachineBasicBlock::iterator I) const {
   BuildMI(MBB, I, I->getDebugLoc(), get(LCC::RET)).addReg(LCC::LR);
 }
 
@@ -60,11 +61,12 @@ const LCCInstrInfo *llvm::createLCCSEInstrInfo(const LCCSubtarget &STI) {
 
 /// Adjust SP by Amount bytes.
 void LCCSEInstrInfo::adjustStackPtr(unsigned SP, int64_t Amount,
-                                     MachineBasicBlock &MBB,
-                                     MachineBasicBlock::iterator I) const {
+                                    MachineBasicBlock &MBB,
+                                    MachineBasicBlock::iterator I) const {
   DebugLoc DL = I != MBB.end() ? I->getDebugLoc() : DebugLoc();
-  unsigned ADDu = LCC::ADDu;
-  unsigned ADDiu = LCC::ADDiu;
+  // fixme
+  unsigned ADDu = LCC::ADD;
+  unsigned ADDiu = LCC::ADDi;
 
   if (isInt<16>(Amount)) {
     // addiu sp, sp, amount
@@ -78,14 +80,16 @@ void LCCSEInstrInfo::adjustStackPtr(unsigned SP, int64_t Amount,
 /// This function generates the sequence of instructions needed to get the
 /// result of adding register REG and immediate IMM.
 unsigned LCCSEInstrInfo::loadImmediate(int64_t Imm, MachineBasicBlock &MBB,
-                                        MachineBasicBlock::iterator II,
-                                        const DebugLoc &DL,
-                                        unsigned *NewImm) const {
+                                       MachineBasicBlock::iterator II,
+                                       const DebugLoc &DL,
+                                       unsigned *NewImm) const {
   LCCAnalyzeImmediate AnalyzeImm;
   unsigned Size = 32;
-  unsigned LUi = LCC::LUi;
-  unsigned ZEROReg = LCC::ZERO;
-  unsigned ATReg = LCC::AT;
+  // fixme
+  unsigned LUi = LCC::LD;
+  unsigned ZEROReg = LCC::ADD;
+  unsigned ATReg = LCC::ADD;
+
   bool LastInstrIsADDiu = NewImm;
 
   const LCCAnalyzeImmediate::InstSeq &Seq =
@@ -118,11 +122,11 @@ unsigned LCCSEInstrInfo::loadImmediate(int64_t Imm, MachineBasicBlock &MBB,
 }
 
 void LCCSEInstrInfo::storeRegToStack(MachineBasicBlock &MBB,
-                                      MachineBasicBlock::iterator I,
-                                      unsigned SrcReg, bool isKill, int FI,
-                                      const TargetRegisterClass *RC,
-                                      const TargetRegisterInfo *TRI,
-                                      int64_t Offset) const {
+                                     MachineBasicBlock::iterator I,
+                                     unsigned SrcReg, bool isKill, int FI,
+                                     const TargetRegisterClass *RC,
+                                     const TargetRegisterInfo *TRI,
+                                     int64_t Offset) const {
   DebugLoc DL;
   MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOStore);
 
@@ -138,11 +142,11 @@ void LCCSEInstrInfo::storeRegToStack(MachineBasicBlock &MBB,
 }
 
 void LCCSEInstrInfo::loadRegFromStack(MachineBasicBlock &MBB,
-                                       MachineBasicBlock::iterator I,
-                                       unsigned DestReg, int FI,
-                                       const TargetRegisterClass *RC,
-                                       const TargetRegisterInfo *TRI,
-                                       int64_t Offset) const {
+                                      MachineBasicBlock::iterator I,
+                                      unsigned DestReg, int FI,
+                                      const TargetRegisterClass *RC,
+                                      const TargetRegisterInfo *TRI,
+                                      int64_t Offset) const {
   DebugLoc DL;
   if (I != MBB.end())
     DL = I->getDebugLoc();

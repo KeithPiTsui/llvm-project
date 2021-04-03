@@ -213,9 +213,8 @@ def simm16      : Operand<i16> {
   let DecoderMethod= "DecodeSimm16";
 }
 
-class ImmSEPL<int size>: PatLeaf<(imm), [{ return isInt<size>(N->getSExtValue()); }]>;
-def imm5PL: ImmSEPL<5>;
-def imm9PL: ImmSEPL<9>;
+def imm5PL: PatLeaf<(imm), [{ return isInt<5>(N->getSExtValue()); }]>;
+def imm9PL: PatLeaf<(imm), [{ return isInt<9>(N->getSExtValue()); }]>;
 
 def ADDi: ArithLogic2Regs<0x01, "add", add, simm16, imm5PL, CPURegs>;
 def ADD: ArithLogic3Regs<0x01, "add", add, IIAlu, CPURegs, 1>;

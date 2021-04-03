@@ -27,8 +27,8 @@ void LCCSubtarget::anchor() {}
 
 //@1 {
 LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
-                             const std::string &FS, bool little,
-                             const LCCTargetMachine &_TM)
+                           const std::string &FS, bool little,
+                           const LCCTargetMachine &_TM)
     : //@1 }
       // LCCGenSubtargetInfo will display features by llc -march=LCC
       // -mcpu=help
@@ -45,9 +45,8 @@ bool LCCSubtarget::isPositionIndependent() const {
 
 LCCSubtarget &
 LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
-                                               const TargetMachine &TM) {
-  if (TargetTriple.getArch() == Triple::LCC ||
-      TargetTriple.getArch() == Triple::LCCel) {
+                                              const TargetMachine &TM) {
+  if (TargetTriple.getArch() == Triple::LCC) {
     if (CPU.empty() || CPU == "generic") {
       CPU = "LCC32II";
     } else if (CPU == "help") {
