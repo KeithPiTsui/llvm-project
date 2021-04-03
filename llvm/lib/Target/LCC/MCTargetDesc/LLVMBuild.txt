@@ -19,8 +19,5 @@
 type = Library
 name = LCCDesc
 parent = LCC
-required_libraries = MC 
-                     LCCInfo 
-                     Support
+required_libraries = MC LCCInfo Support
 add_to_library_groups = LCC
-

@@ -11,6 +11,7 @@
 
 #include "LCCInstrInfo.h"
 #include "LCCSubtarget.h"
+#include "MCTargetDesc/LCCBaseInfo.h"
 #include "llvm/CodeGen/MachineInstrBuilder.h"
 #include "llvm/CodeGen/MachineRegisterInfo.h"
 #include "llvm/IR/Function.h"

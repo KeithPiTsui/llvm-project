@@ -12,9 +12,13 @@
 #include "llvm/Support/TargetRegistry.h"
 using namespace llvm;
 
-Target llvm::TheLCCTarget;
+Target llvm::TheLCCTarget, llvm::TheLCCelTarget;
 
 extern "C" void LLVMInitializeLCCTargetInfo() {
   RegisterTarget<Triple::LCC,
                  /*HasJIT=*/true> X(TheLCCTarget, "LCC", "LCC", "LCC");
+
+  RegisterTarget<Triple::LCCel,
+                 /*HasJIT=*/true> Y(TheLCCelTarget, "LCCel", "LCCel", "LCCel");
 }
+

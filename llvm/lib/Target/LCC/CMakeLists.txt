@@ -1,9 +1,5 @@
-set(LLVM_TARGET_DEFINITIONS LCCOther.td)
+set(LLVM_TARGET_DEFINITIONS LCC.td)
 
-# Generate LCCGenRegisterInfo.inc and LCCGenInstrInfo.inc which included by
-#  your hand code C++ files.
-# LCCGenRegisterInfo.inc came from LCCRegisterInfo.td, LCCGenInstrInfo.inc
-#  came from LCCInstrInfo.td.
 tablegen(LLVM LCCGenRegisterInfo.inc -gen-register-info)
 tablegen(LLVM LCCGenInstrInfo.inc -gen-instr-info)
 tablegen(LLVM LCCGenCodeEmitter.inc -gen-emitter)
@@ -20,6 +16,8 @@ add_public_tablegen_target(LCCCommonTableGen)
 
 # LCCCodeGen should match with LLVMBuild.txt LCCCodeGen
 add_llvm_target(LCCCodeGen
+  LCCAsmPrinter.cpp
+  LCCMCInstLower.cpp
   LCCFrameLowering.cpp
   LCCInstrInfo.cpp
   LCCISelLowering.cpp
@@ -32,9 +30,15 @@ add_llvm_target(LCCCodeGen
   LCCSubtarget.cpp
   LCCTargetObjectFile.cpp
   LCCTargetMachine.cpp
+
+  LCCISelDAGToDAG.cpp
+  LCCSEISelDAGToDAG.cpp
+
+  LCCAnalyzeImmediate.cpp
   )
 
 # Should match with "subdirectories =  MCTargetDesc TargetInfo" in LLVMBuild.txt
 #add_subdirectory(InstPrinter)
 add_subdirectory(TargetInfo)
 add_subdirectory(MCTargetDesc)
+

@@ -1,14 +1,5 @@
 //===-- LCCSubtarget.cpp - LCC Subtarget Information --------------------===//
-//
-//                     The LLVM Compiler Infrastructure
-//
-// This file is distributed under the University of Illinois Open Source
-// License. See LICENSE.TXT for details.
-//
-//===----------------------------------------------------------------------===//
-//
 // This file implements the LCC specific subclass of TargetSubtargetInfo.
-//
 //===----------------------------------------------------------------------===//
 
 #include "LCCSubtarget.h"
@@ -36,9 +27,11 @@ void LCCSubtarget::anchor() {}
 
 //@1 {
 LCCSubtarget::LCCSubtarget(const Triple &TT, const std::string &CPU,
-                           const std::string &FS, bool little,
-                           const LCCTargetMachine &_TM)
+                             const std::string &FS, bool little,
+                             const LCCTargetMachine &_TM)
     : //@1 }
+      // LCCGenSubtargetInfo will display features by llc -march=LCC
+      // -mcpu=help
       LCCGenSubtargetInfo(TT, CPU, FS), IsLittle(little), TM(_TM),
       TargetTriple(TT), TSInfo(),
       InstrInfo(
@@ -52,12 +45,47 @@ bool LCCSubtarget::isPositionIndependent() const {
 
 LCCSubtarget &
 LCCSubtarget::initializeSubtargetDependencies(StringRef CPU, StringRef FS,
-                                              const TargetMachine &TM) {
+                                               const TargetMachine &TM) {
+  if (TargetTriple.getArch() == Triple::LCC ||
+      TargetTriple.getArch() == Triple::LCCel) {
+    if (CPU.empty() || CPU == "generic") {
+      CPU = "LCC32II";
+    } else if (CPU == "help") {
+      CPU = "";
+      return *this;
+    } else if (CPU != "LCC32I" && CPU != "LCC32II") {
+      CPU = "LCC32II";
+    }
+  } else {
+    errs() << "!!!Error, TargetTriple.getArch() = " << TargetTriple.getArch()
+           << "CPU = " << CPU << "\n";
+    exit(0);
+  }
+
+  if (CPU == "LCC32I")
+    LCCArchVersion = LCC32I;
+  else if (CPU == "LCC32II")
+    LCCArchVersion = LCC32II;
+
+  if (isLCC32I()) {
+    HasCmp = true;
+    HasSlt = false;
+  } else if (isLCC32II()) {
+    HasCmp = true;
+    HasSlt = true;
+  } else {
+    errs() << "-mcpu must be empty(default:LCC32II), LCC32I or LCC32II"
+           << "\n";
+  }
+  // Parse features string.
   ParseSubtargetFeatures(CPU, FS);
+  // Initialize scheduling itinerary for the specified CPU.
   InstrItins = getInstrItineraryForCPU(CPU);
   return *this;
 }
 
-bool LCCSubtarget::abiUsesSoftFloat() const { return true; }
-
+bool LCCSubtarget::abiUsesSoftFloat() const {
+  //  return TM->Options.UseSoftFloat;
+  return true;
+}
 const LCCABIInfo &LCCSubtarget::getABI() const { return TM.getABI(); }

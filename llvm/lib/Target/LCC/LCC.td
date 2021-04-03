@@ -1,11 +1,20 @@
 //===-- LCC.td - Describe the LCC Target Machine ---------*- tablegen -*-===//
 //===----------------------------------------------------------------------===//
+// Target-independent interfaces
+//===----------------------------------------------------------------------===//
+include "llvm/Target/Target.td"
+//===----------------------------------------------------------------------===//
+// Target-dependent interfaces
+//===----------------------------------------------------------------------===//
+include "LCCRegisterInfo.td"
+include "LCCRegisterInfoGPROutForOther.td" // except AsmParser
+include "LCC.td"
+//===----------------------------------------------------------------------===//
 // Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//
 include "LCCSchedule.td"
 include "LCCInstrInfo.td"
 include "LCCCallingConv.td"
-
 //===----------------------------------------------------------------------===//
 // LCC processors supported.
 //===----------------------------------------------------------------------===//

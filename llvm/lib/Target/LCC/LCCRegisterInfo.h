@@ -15,7 +15,6 @@
 #define LLVM_LIB_TARGET_LCC_LCCREGISTERINFO_H
 
 
-
 #include "LCC.h"
 #include "llvm/CodeGen/Register.h"
 #include "llvm/CodeGen/TargetRegisterInfo.h"

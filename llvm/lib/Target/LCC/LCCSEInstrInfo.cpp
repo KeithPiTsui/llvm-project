@@ -22,6 +22,8 @@
 #include "llvm/Support/ErrorHandling.h"
 #include "llvm/Support/TargetRegistry.h"
 
+#include "LCCAnalyzeImmediate.h"
+
 using namespace llvm;
 
 LCCSEInstrInfo::LCCSEInstrInfo(const LCCSubtarget &STI)
@@ -29,6 +31,128 @@ LCCSEInstrInfo::LCCSEInstrInfo(const LCCSubtarget &STI)
 
 const LCCRegisterInfo &LCCSEInstrInfo::getRegisterInfo() const { return RI; }
 
+//@expandPostRAPseudo
+/// Expand Pseudo instructions into real backend instructions
+bool LCCSEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
+  //@expandPostRAPseudo-body
+  MachineBasicBlock &MBB = *MI.getParent();
+
+  switch (MI.getDesc().getOpcode()) {
+  default:
+    return false;
+  case LCC::RetLR:
+    expandRetLR(MBB, MI);
+    break;
+  }
+
+  MBB.erase(MI);
+  return true;
+}
+
+void LCCSEInstrInfo::expandRetLR(MachineBasicBlock &MBB,
+                                  MachineBasicBlock::iterator I) const {
+  BuildMI(MBB, I, I->getDebugLoc(), get(LCC::RET)).addReg(LCC::LR);
+}
+
 const LCCInstrInfo *llvm::createLCCSEInstrInfo(const LCCSubtarget &STI) {
   return new LCCSEInstrInfo(STI);
+}
+
+/// Adjust SP by Amount bytes.
+void LCCSEInstrInfo::adjustStackPtr(unsigned SP, int64_t Amount,
+                                     MachineBasicBlock &MBB,
+                                     MachineBasicBlock::iterator I) const {
+  DebugLoc DL = I != MBB.end() ? I->getDebugLoc() : DebugLoc();
+  unsigned ADDu = LCC::ADDu;
+  unsigned ADDiu = LCC::ADDiu;
+
+  if (isInt<16>(Amount)) {
+    // addiu sp, sp, amount
+    BuildMI(MBB, I, DL, get(ADDiu), SP).addReg(SP).addImm(Amount);
+  } else { // Expand immediate that doesn't fit in 16-bit.
+    unsigned Reg = loadImmediate(Amount, MBB, I, DL, nullptr);
+    BuildMI(MBB, I, DL, get(ADDu), SP).addReg(SP).addReg(Reg, RegState::Kill);
+  }
+}
+
+/// This function generates the sequence of instructions needed to get the
+/// result of adding register REG and immediate IMM.
+unsigned LCCSEInstrInfo::loadImmediate(int64_t Imm, MachineBasicBlock &MBB,
+                                        MachineBasicBlock::iterator II,
+                                        const DebugLoc &DL,
+                                        unsigned *NewImm) const {
+  LCCAnalyzeImmediate AnalyzeImm;
+  unsigned Size = 32;
+  unsigned LUi = LCC::LUi;
+  unsigned ZEROReg = LCC::ZERO;
+  unsigned ATReg = LCC::AT;
+  bool LastInstrIsADDiu = NewImm;
+
+  const LCCAnalyzeImmediate::InstSeq &Seq =
+      AnalyzeImm.Analyze(Imm, Size, LastInstrIsADDiu);
+  LCCAnalyzeImmediate::InstSeq::const_iterator Inst = Seq.begin();
+
+  assert(Seq.size() && (!LastInstrIsADDiu || (Seq.size() > 1)));
+
+  // The first instruction can be a LUi, which is different from other
+  // instructions (ADDiu, ORI and SLL) in that it does not have a register
+  // operand.
+  if (Inst->Opc == LUi)
+    BuildMI(MBB, II, DL, get(LUi), ATReg)
+        .addImm(SignExtend64<16>(Inst->ImmOpnd));
+  else
+    BuildMI(MBB, II, DL, get(Inst->Opc), ATReg)
+        .addReg(ZEROReg)
+        .addImm(SignExtend64<16>(Inst->ImmOpnd));
+
+  // Build the remaining instructions in Seq.
+  for (++Inst; Inst != Seq.end() - LastInstrIsADDiu; ++Inst)
+    BuildMI(MBB, II, DL, get(Inst->Opc), ATReg)
+        .addReg(ATReg)
+        .addImm(SignExtend64<16>(Inst->ImmOpnd));
+
+  if (LastInstrIsADDiu)
+    *NewImm = Inst->ImmOpnd;
+
+  return ATReg;
+}
+
+void LCCSEInstrInfo::storeRegToStack(MachineBasicBlock &MBB,
+                                      MachineBasicBlock::iterator I,
+                                      unsigned SrcReg, bool isKill, int FI,
+                                      const TargetRegisterClass *RC,
+                                      const TargetRegisterInfo *TRI,
+                                      int64_t Offset) const {
+  DebugLoc DL;
+  MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOStore);
+
+  unsigned Opc = 0;
+
+  Opc = LCC::ST;
+  assert(Opc && "Register class not handled!");
+  BuildMI(MBB, I, DL, get(Opc))
+      .addReg(SrcReg, getKillRegState(isKill))
+      .addFrameIndex(FI)
+      .addImm(Offset)
+      .addMemOperand(MMO);
+}
+
+void LCCSEInstrInfo::loadRegFromStack(MachineBasicBlock &MBB,
+                                       MachineBasicBlock::iterator I,
+                                       unsigned DestReg, int FI,
+                                       const TargetRegisterClass *RC,
+                                       const TargetRegisterInfo *TRI,
+                                       int64_t Offset) const {
+  DebugLoc DL;
+  if (I != MBB.end())
+    DL = I->getDebugLoc();
+  MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOLoad);
+  unsigned Opc = 0;
+
+  Opc = LCC::LD;
+  assert(Opc && "Register class not handled!");
+  BuildMI(MBB, I, DL, get(Opc), DestReg)
+      .addFrameIndex(FI)
+      .addImm(Offset)
+      .addMemOperand(MMO);
 }

@@ -39,8 +39,15 @@ const LCCInstrInfo *LCCInstrInfo::create(LCCSubtarget &STI) {
 /// Return the number of bytes of code the specified instruction may be.
 unsigned LCCInstrInfo::GetInstSizeInBytes(const MachineInstr &MI) const {
   //@GetInstSizeInBytes - body
-  switch (MI.getOpcode()) {
-  default:
-    return MI.getDesc().getSize();
-  }
+  return MI.getDesc().getSize();
+}
+
+MachineMemOperand *
+LCCInstrInfo::GetMemOperand(MachineBasicBlock &MBB, int FI,
+                             MachineMemOperand::Flags Flags) const {
+  MachineFunction &MF = *MBB.getParent();
+  MachineFrameInfo &MFI = MF.getFrameInfo();
+  unsigned align = MFI.getObjectAlignment(FI);
+  return MF.getMachineMemOperand(MachinePointerInfo::getFixedStack(MF, FI),
+                                 Flags, MFI.getObjectSize(FI), Align(align));
 }
