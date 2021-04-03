@@ -7,8 +7,6 @@ include "llvm/Target/Target.td"
 // Target-dependent interfaces
 //===----------------------------------------------------------------------===//
 include "LCCRegisterInfo.td"
-include "LCCRegisterInfoGPROutForOther.td" // except AsmParser
-include "LCC.td"
 //===----------------------------------------------------------------------===//
 // Calling Conv, Instruction Descriptions
 //===----------------------------------------------------------------------===//
