@@ -32,43 +32,9 @@ namespace llvm {
 class StringRef;
 class LCCTargetMachine;
 class LCCSubtarget : public LCCGenSubtargetInfo {
-  virtual void anchor();
-
-public:
-  bool HasChapterDummy;
-  bool HasChapterAll;
-  bool hasChapter3_1() const { return true; }
-  bool hasChapter3_2() const { return true; }
-  bool hasChapter3_3() const { return true; }
-  bool hasChapter3_4() const { return true; }
-  bool hasChapter3_5() const { return true; }
-  bool hasChapter4_1() const { return false; }
-  bool hasChapter4_2() const { return false; }
-  bool hasChapter5_1() const { return false; }
-  bool hasChapter6_1() const { return false; }
-  bool hasChapter7_1() const { return false; }
-  bool hasChapter8_1() const { return false; }
-  bool hasChapter8_2() const { return false; }
-  bool hasChapter9_1() const { return false; }
-  bool hasChapter9_2() const { return false; }
-  bool hasChapter9_3() const { return false; }
-  bool hasChapter10_1() const { return false; }
-  bool hasChapter11_1() const { return false; }
-  bool hasChapter11_2() const { return false; }
-  bool hasChapter12_1() const { return false; }
 
 protected:
-  enum LCCArchEnum { LCC32I, LCC32II };
-
-  // LCC architecture version
-  LCCArchEnum LCCArchVersion;
-  // IsLittle - The target is Little Endian
   bool IsLittle;
-  bool EnableOverflow;
-  // HasCmp - cmp instructions.
-  bool HasCmp;
-  // HasSlt - slt instructions.
-  bool HasSlt;
   InstrItineraryData InstrItins;
   const LCCTargetMachine &TM;
   Triple TargetTriple;
@@ -90,19 +56,7 @@ public:
   void ParseSubtargetFeatures(StringRef CPU, StringRef FS);
 
   bool isLittle() const { return IsLittle; }
-  bool hasLCC32I() const { return LCCArchVersion >= LCC32I; }
-  bool isLCC32I() const { return LCCArchVersion == LCC32I; }
-  bool hasLCC32II() const { return LCCArchVersion >= LCC32II; }
-  bool isLCC32II() const { return LCCArchVersion == LCC32II; }
-
-  /// Features related to the presence of specific instructions.
-  bool enableOverflow() const { return EnableOverflow; }
-  bool disableOverflow() const { return !EnableOverflow; }
-  bool hasCmp() const { return HasCmp; }
-  bool hasSlt() const { return HasSlt; }
-
   bool abiUsesSoftFloat() const;
-  bool enableLongBranchPass() const { return hasLCC32II(); }
   Align stackAlignment() const { return Align(8); }
   LCCSubtarget &initializeSubtargetDependencies(StringRef CPU, StringRef FS,
                                                 const TargetMachine &TM);

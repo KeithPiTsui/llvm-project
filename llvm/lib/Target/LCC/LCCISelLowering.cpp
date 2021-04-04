@@ -187,7 +187,6 @@ void LCCTargetLowering::LCCCC::analyzeReturn(const SmallVectorImpl<Ty> &RetVals,
     MVT VT = RetVals[I].VT;
     ISD::ArgFlagsTy Flags = RetVals[I].Flags;
     MVT RegVT = this->getRegVT(VT, RetTy, CallNode, IsSoftFloat);
-
     if (Fn(I, VT, RegVT, CCValAssign::Full, Flags, this->CCInfo)) {
 #ifndef NDEBUG
       dbgs() << "Call result #" << I << " has unhandled type "
