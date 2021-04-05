@@ -36,11 +36,10 @@ LCCSEFrameLowering::LCCSEFrameLowering(const LCCSubtarget &STI)
 
 //@emitPrologue {
 void LCCSEFrameLowering::emitPrologue(MachineFunction &MF,
-                                       MachineBasicBlock &MBB) const {
+                                      MachineBasicBlock &MBB) const {
   assert(&MF.front() == &MBB && "Shrink-wrapping not yet supported");
   MachineFrameInfo &MFI = MF.getFrameInfo();
   LCCFunctionInfo *LCCFI = MF.getInfo<LCCFunctionInfo>();
-
   const LCCSEInstrInfo &TII =
       *static_cast<const LCCSEInstrInfo *>(STI.getInstrInfo());
   const LCCRegisterInfo &RegInfo =
@@ -101,7 +100,7 @@ void LCCSEFrameLowering::emitPrologue(MachineFunction &MF,
 
 //@emitEpilogue {
 void LCCSEFrameLowering::emitEpilogue(MachineFunction &MF,
-                                       MachineBasicBlock &MBB) const {
+                                      MachineBasicBlock &MBB) const {
   MachineBasicBlock::iterator MBBI = MBB.getLastNonDebugInstr();
   MachineFrameInfo &MFI = MF.getFrameInfo();
   LCCFunctionInfo *LCCFI = MF.getInfo<LCCFunctionInfo>();
@@ -126,8 +125,7 @@ void LCCSEFrameLowering::emitEpilogue(MachineFunction &MF,
 }
 //}
 
-bool LCCSEFrameLowering::hasReservedCallFrame(
-    const MachineFunction &MF) const {
+bool LCCSEFrameLowering::hasReservedCallFrame(const MachineFunction &MF) const {
   const MachineFrameInfo &MFI = MF.getFrameInfo();
 
   // Reserve call frame if the size of the maximum call frame fits into 16-bit
@@ -138,8 +136,7 @@ bool LCCSEFrameLowering::hasReservedCallFrame(
          !MFI.hasVarSizedObjects();
 }
 
-const LCCFrameLowering *
-llvm::createLCCSEFrameLowering(const LCCSubtarget &ST) {
+const LCCFrameLowering *llvm::createLCCSEFrameLowering(const LCCSubtarget &ST) {
   return new LCCSEFrameLowering(ST);
 }
 
@@ -147,8 +144,8 @@ llvm::createLCCSEFrameLowering(const LCCSubtarget &ST) {
 //  physical registers used to determine what callee saved registers should be
 //  spilled. This method is optional.
 void LCCSEFrameLowering::determineCalleeSaves(MachineFunction &MF,
-                                               BitVector &SavedRegs,
-                                               RegScavenger *RS) const {
+                                              BitVector &SavedRegs,
+                                              RegScavenger *RS) const {
   //@determineCalleeSaves-body
   TargetFrameLowering::determineCalleeSaves(MF, SavedRegs, RS);
   LCCFunctionInfo *LCCFI = MF.getInfo<LCCFunctionInfo>();

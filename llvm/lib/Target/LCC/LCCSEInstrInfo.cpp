@@ -32,12 +32,8 @@ LCCSEInstrInfo::LCCSEInstrInfo(const LCCSubtarget &STI)
 
 const LCCRegisterInfo &LCCSEInstrInfo::getRegisterInfo() const { return RI; }
 
-//@expandPostRAPseudo
-/// Expand Pseudo instructions into real backend instructions
 bool LCCSEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
-  //@expandPostRAPseudo-body
   MachineBasicBlock &MBB = *MI.getParent();
-
   switch (MI.getDesc().getOpcode()) {
   default:
     return false;
@@ -45,14 +41,14 @@ bool LCCSEInstrInfo::expandPostRAPseudo(MachineInstr &MI) const {
     expandRetLR(MBB, MI);
     break;
   }
-
   MBB.erase(MI);
   return true;
 }
 
 void LCCSEInstrInfo::expandRetLR(MachineBasicBlock &MBB,
                                  MachineBasicBlock::iterator I) const {
-  BuildMI(MBB, I, I->getDebugLoc(), get(LCC::RET)).addReg(LCC::LR);
+  // expand Ret LR to ret.
+  BuildMI(MBB, I, I->getDebugLoc(), get(LCC::RET));
 }
 
 const LCCInstrInfo *llvm::createLCCSEInstrInfo(const LCCSubtarget &STI) {
@@ -68,10 +64,12 @@ void LCCSEInstrInfo::adjustStackPtr(unsigned SP, int64_t Amount,
   unsigned ADDu = LCC::ADD;
   unsigned ADDiu = LCC::ADDi;
 
-  if (isInt<16>(Amount)) {
+  if (isInt<5>(Amount)) {
     // addiu sp, sp, amount
     BuildMI(MBB, I, DL, get(ADDiu), SP).addReg(SP).addImm(Amount);
   } else { // Expand immediate that doesn't fit in 16-bit.
+    assert(false &&
+           "Not yet support adjsut sp by amount of byte larger than 32");
     unsigned Reg = loadImmediate(Amount, MBB, I, DL, nullptr);
     BuildMI(MBB, I, DL, get(ADDu), SP).addReg(SP).addReg(Reg, RegState::Kill);
   }
@@ -129,9 +127,7 @@ void LCCSEInstrInfo::storeRegToStack(MachineBasicBlock &MBB,
                                      int64_t Offset) const {
   DebugLoc DL;
   MachineMemOperand *MMO = GetMemOperand(MBB, FI, MachineMemOperand::MOStore);
-
   unsigned Opc = 0;
-
   Opc = LCC::ST;
   assert(Opc && "Register class not handled!");
   BuildMI(MBB, I, DL, get(Opc))

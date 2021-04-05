@@ -13,8 +13,6 @@
 #ifndef LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
 #define LLVM_LIB_TARGET_LCC_LCCFRAMELOWERING_H
 
-
-
 #include "LCC.h"
 #include "llvm/CodeGen/TargetFrameLowering.h"
 #include "llvm/Support/Alignment.h"
