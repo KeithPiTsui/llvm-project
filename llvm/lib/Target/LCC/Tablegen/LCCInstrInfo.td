@@ -132,6 +132,7 @@ class FF <bits<4> op,dag outs, dag ins, string asmstr,
   let Inst{5-0} = imm6;
 }
 
+
 def FrmG      : Format<8>; // format for <opcode> '000' <ra> '000' <rb>
 class FG <bits<4> op,dag outs, dag ins, string asmstr,
          list<dag> pattern, InstrItinClass itin>:
@@ -316,6 +317,13 @@ multiclass StoreM16<bits<4> op, string instr_asm, PatFrag OpNode,
 ///  aligned
 defm LD     : LoadM16<0b0010,  "ld",  load_a>;
 defm ST     : StoreM16<0b0011, "st",  store_a>;
+
+
+// def LDR: FF<0b0110, (outs GPROut:$ra), (ins CPURegs:$rb, simm16:$imm6), !strconcat("ldr", "\t$ra, $rb, $imm6"),
+//            [(set GPROut:$ra, (load CPURegs:$rb, simm16:$imm6))],IIAlu>;
+// def STR: FF<0b0110, (outs), (ins CPURegs:$ra, CPURegs:$rb, simm16:$imm6), !strconcat("str", "\t$ra, $rb, $imm6"),
+//            [(store CPURegs:$ra, CPURegs:$rb, simm16:$imm6)],IIAlu>;
+
 
 
 
