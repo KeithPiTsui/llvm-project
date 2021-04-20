@@ -44,6 +44,6 @@ public:
 
   TargetTransformInfo getTargetTransformInfo(const Function &F) override;
 };
-}
+} // namespace llvm
 
 #endif

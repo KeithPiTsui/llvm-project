@@ -63,8 +63,8 @@ static MCAsmInfo *createRISCVMCAsmInfo(const MCRegisterInfo &MRI,
   return MAI;
 }
 
-static MCSubtargetInfo *createRISCVMCSubtargetInfo(const Triple &TT,
-                                                   StringRef CPU, StringRef FS) {
+static MCSubtargetInfo *
+createRISCVMCSubtargetInfo(const Triple &TT, StringRef CPU, StringRef FS) {
   std::string CPUName = std::string(CPU);
   if (CPUName.empty())
     CPUName = TT.isArch64Bit() ? "generic-rv64" : "generic-rv32";
@@ -149,7 +149,6 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeRISCVTargetMC() {
     TargetRegistry::RegisterObjectTargetStreamer(
         *T, createRISCVObjectTargetStreamer);
     TargetRegistry::RegisterMCInstrAnalysis(*T, createRISCVInstrAnalysis);
-
     // Register the asm target streamer.
     TargetRegistry::RegisterAsmTargetStreamer(*T, createRISCVAsmTargetStreamer);
     // Register the null target streamer.

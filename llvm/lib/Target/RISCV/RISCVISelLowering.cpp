@@ -1960,6 +1960,21 @@ static bool CC_RISCV_FastCC(unsigned ValNo, MVT ValVT, MVT LocVT,
 }
 
 // Transform physical registers into virtual registers.
+// * thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 1.1
+//   * #0:  `llvm::RISCVTargetLowering::LowerFormalArguments at RISCVISelLowering.cpp:1968:11
+//     #1:  `llvm::SelectionDAGISel::LowerArguments at SelectionDAGBuilder.cpp:9887:26
+//     #2:  `llvm::SelectionDAGISel::SelectAllBasicBlocks at SelectionDAGISel.cpp:1361:5
+//     #3:  `llvm::SelectionDAGISel::runOnMachineFunction at SelectionDAGISel.cpp:504:3
+//     #4:  `llvm::RISCVDAGToDAGISel::runOnMachineFunction at RISCVISelDAGToDAG.h:36:30
+//     #5:  `llvm::MachineFunctionPass::runOnFunction at MachineFunctionPass.cpp:73:13
+//     #6:  `llvm::FPPassManager::runOnFunction at LegacyPassManager.cpp:1516:27
+//     #7:  `llvm::FPPassManager::runOnModule at LegacyPassManager.cpp:1552:16
+//     #8:  `(anonymous namespace)::MPPassManager::runOnModule at LegacyPassManager.cpp:1617:27
+//     #9:  `llvm::legacy::PassManagerImpl::run at LegacyPassManager.cpp:614:44
+//     #10:  `llvm::legacy::PassManager::run at LegacyPassManager.cpp:1737:14
+//     #11:  `compileModule at llc.cpp:650:8
+//     #12:  `main at llc.cpp:360:22
+//     #13:  `start + 4
 SDValue RISCVTargetLowering::LowerFormalArguments(
     SDValue Chain, CallingConv::ID CallConv, bool IsVarArg,
     const SmallVectorImpl<ISD::InputArg> &Ins, const SDLoc &DL,
@@ -2469,6 +2484,27 @@ bool RISCVTargetLowering::CanLowerReturn(
   return true;
 }
 
+
+/*
+* thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 3.1
+  * #0:  `llvm::RISCVTargetLowering::LowerReturn at RISCVISelLowering.cpp:2478:31
+    #1:  `llvm::SelectionDAGBuilder::visitRet at SelectionDAGBuilder.cpp:1963:39
+    #2:  `llvm::SelectionDAGBuilder::visit at Instruction.def:127:1
+    #3:  `llvm::SelectionDAGBuilder::visit at SelectionDAGBuilder.cpp:1117:3
+    #4:  `llvm::SelectionDAGISel::SelectBasicBlock at SelectionDAGISel.cpp:704:12
+    #5:  `llvm::SelectionDAGISel::SelectAllBasicBlocks at SelectionDAGISel.cpp:1588:7
+    #6:  `llvm::SelectionDAGISel::runOnMachineFunction at SelectionDAGISel.cpp:504:3
+    #7:  `llvm::RISCVDAGToDAGISel::runOnMachineFunction at RISCVISelDAGToDAG.h:36:30
+    #8:  `llvm::MachineFunctionPass::runOnFunction at MachineFunctionPass.cpp:73:13
+    #9:  `llvm::FPPassManager::runOnFunction at LegacyPassManager.cpp:1516:27
+    #10:  `llvm::FPPassManager::runOnModule at LegacyPassManager.cpp:1552:16
+    #11:  `(anonymous namespace)::MPPassManager::runOnModule at LegacyPassManager.cpp:1617:27
+    #12:  `llvm::legacy::PassManagerImpl::run at LegacyPassManager.cpp:614:44
+    #13:  `llvm::legacy::PassManager::run at LegacyPassManager.cpp:1737:14
+    #14:  `compileModule at llc.cpp:650:8
+    #15:  `main at llc.cpp:360:22
+    #16:  `start + 4
+ */
 SDValue
 RISCVTargetLowering::LowerReturn(SDValue Chain, CallingConv::ID CallConv,
                                  bool IsVarArg,

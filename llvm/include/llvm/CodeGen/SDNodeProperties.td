@@ -6,6 +6,7 @@
 //
 //===----------------------------------------------------------------------===//
 
+// Hard coded into tblgen
 class SDNodeProperty;
 
 // Selection DAG Pattern Operations
