@@ -1,0 +1,3 @@
+b llvm::RISCVDAGToDAGISel::SelectAddrFI
+b llvm::RISCVDAGToDAGISel::CheckComplexPattern
+br s -f SelectionDAGISel.cpp -l 2896 -c 'NodeToMatch->getOpcode() == 235'
