@@ -1,3 +1,22 @@
-b llvm::RISCVDAGToDAGISel::SelectAddrFI
-b llvm::RISCVDAGToDAGISel::CheckComplexPattern
-br s -f SelectionDAGISel.cpp -l 2896 -c 'NodeToMatch->getOpcode() == 235'
+# parse an IR file into Module.
+b llvm::parseIRFile
+# Got a Module.
+b llc.cpp:524
+# Add passes to generate assembly from IR.
+b LLVMTargetMachine::addPassesToEmitFile
+
+# b llvm::SelectionDAGISel::runOnMachineFunction
+# b llvm::SelectionDAGISel::SelectAllBasicBlocks
+# b llvm::SelectionDAGISel::SelectBasicBlock
+# b llvm::SelectionDAGISel::SelectCodeCommon
+# b llvm::SelectionDAGISel::MorphNode
+# b SelectionDAGISel::2895
+# b llvm::RISCVDAGToDAGISel::SelectAddrFI
+# b llvm::RISCVDAGToDAGISel::CheckComplexPattern
+# br s -f SelectionDAGISel.cpp -l 2896 -c 'NodeToMatch->getOpcode() == 235'
+
+#b llvm::RISCVTargetLowering::LowerFormalArguments
+#b llvm::SelectionDAGISel::LowerArguments
+
+# to find which scheduler is on
+b ScheduleDAGSDNodes::Run
