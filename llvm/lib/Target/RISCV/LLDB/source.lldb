@@ -1,9 +1,9 @@
 # parse an IR file into Module.
-b llvm::parseIRFile
+#b llvm::parseIRFile
 # Got a Module.
-b llc.cpp:524
+#b llc.cpp:524
 # Add passes to generate assembly from IR.
-b LLVMTargetMachine::addPassesToEmitFile
+#b LLVMTargetMachine::addPassesToEmitFile
 
 # b llvm::SelectionDAGISel::runOnMachineFunction
 # b llvm::SelectionDAGISel::SelectAllBasicBlocks
@@ -19,4 +19,9 @@ b LLVMTargetMachine::addPassesToEmitFile
 #b llvm::SelectionDAGISel::LowerArguments
 
 # to find which scheduler is on
-b ScheduleDAGSDNodes::Run
+#b ScheduleDAGSDNodes::Run
+
+# 
+b AsmPrinter::emitFunctionHeader
+
+b RISCVTargetLowering::LowerOperation

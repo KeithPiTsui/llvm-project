@@ -13,6 +13,7 @@
 //===----------------------------------------------------------------------===//
 
 #include "llvm/ADT/Statistic.h"
+#include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/LegacyPassManagers.h"
@@ -42,15 +43,37 @@ struct LVN : public FunctionPass {
   LVN() : FunctionPass(ID) {}
 
   bool runOnFunction(Function &F) override {
-    errs() << "BBOpts: ";
-    errs().write_escaped(F.getName()) << '\n';
-    return false;
+    bool changed = false;
+    for(auto &BB: F) {
+      changed |= runOnBasicBlock(BB);
+    }
+    return changed;
   }
 
-  // We don't modify the program, so we preserve all analyses.
-  void getAnalysisUsage(AnalysisUsage &AU) const override {
-    AU.setPreservesAll();
+  bool runOnBasicBlock(BasicBlock &BB) {
+    std::map<LVNKey, unsigned> LVNValues{};
+    unsigned valueCounter = 0;
+    for (auto &instr: BB) {
+      auto opcode = instr.getOpcode();
+      if (opcode != Instruction::Add)
+        continue;
+      auto opSize = instr.getNumOperands();
+      if (opSize != 2)
+        continue;
+      auto *left = instr.getOperand(0);
+      auto *right = instr.getOperand(1);
+
+    }
   }
+
+private:
+  struct LVNKey {
+    unsigned lval, opcode, rval;
+    friend bool operator<(const LVNKey &l, const LVNKey &r) {
+      return std::tie(l.lval, l.opcode, l.rval) <
+             std::tie(r.lval, r.opcode, r.rval); // keep the same order
+    }
+  };
 };
 } // namespace
 

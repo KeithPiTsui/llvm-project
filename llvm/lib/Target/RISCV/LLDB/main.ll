@@ -3,6 +3,8 @@ source_filename = "main.c"
 target datalayout = "e-m:e-p:64:64-i64:64-i128:128-n64-S128"
 target triple = "riscv64-unknown-unknown"
 
+@x = dso_local global i32 1, align 4
+@y = dso_local global i32 2, align 4
 @.str = private unnamed_addr constant [14 x i8] c"hello world!\0A\00", align 1
 
 ; Function Attrs: noinline nounwind optnone
@@ -60,7 +62,9 @@ entry:
   store i32 %argc, i32* %argc.addr, align 4
   store i8** %argv, i8*** %argv.addr, align 8
   %call = call signext i32 (i8*, ...) @printf(i8* getelementptr inbounds ([14 x i8], [14 x i8]* @.str, i64 0, i64 0))
-  %call1 = call signext i32 @add(i32 signext 1, i32 signext 2, i32 signext 3, i32 signext 4, i32 signext 5, i32 signext 6, i32 signext 7, i32 signext 8, i32 9, i32 10)
+  %0 = load i32, i32* @x, align 4
+  %1 = load i32, i32* @y, align 4
+  %call1 = call signext i32 @add(i32 signext %0, i32 signext %1, i32 signext 3, i32 signext 4, i32 signext 5, i32 signext 6, i32 signext 7, i32 signext 8, i32 9, i32 10)
   ret i32 %call1
 }
 
@@ -75,4 +79,4 @@ attributes #1 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-
 !0 = !{i32 1, !"wchar_size", i32 4}
 !1 = !{i32 1, !"target-abi", !"lp64d"}
 !2 = !{i32 1, !"SmallDataLimit", i32 8}
-!3 = !{!"clang version 11.1.0 (git@github.com:KeithPiTsui/llvm-project.git e8ab6a7603b475cd2821eb2727e2e9c72f311423)"}
+!3 = !{!"clang version 11.1.0 (git@github.com:KeithPiTsui/llvm-project.git 50024be1edf3ef9951f75df642f59f872d468243)"}

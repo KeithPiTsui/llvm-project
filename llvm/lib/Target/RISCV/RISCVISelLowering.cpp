@@ -422,6 +422,24 @@ static unsigned getBranchOpcodeForIntCondCode(ISD::CondCode CC) {
   }
 }
 
+// * thread #1, queue = 'com.apple.main-thread', stop reason = breakpoint 2.1
+//   * #0:  `llvm::RISCVTargetLowering::LowerOperation at RISCVISelLowering.cpp:427:14
+//     #1:  `(anonymous namespace)::SelectionDAGLegalize::LegalizeOp at LegalizeDAG.cpp:1230:29
+//     #2:  `llvm::SelectionDAG::Legalize at LegalizeDAG.cpp:4849:19
+//     #3:  `llvm::SelectionDAGISel::CodeGenAndEmitDAG at SelectionDAGISel.cpp:904:13
+//     #4:  `llvm::SelectionDAGISel::SelectBasicBlock at SelectionDAGISel.cpp:714:3
+//     #5:  `llvm::SelectionDAGISel::SelectAllBasicBlocks at SelectionDAGISel.cpp:1588:7
+//     #6:  `llvm::SelectionDAGISel::runOnMachineFunction at SelectionDAGISel.cpp:504:3
+//     #7:  `llvm::RISCVDAGToDAGISel::runOnMachineFunction at RISCVISelDAGToDAG.h:36:30
+//     #8:  `llvm::MachineFunctionPass::runOnFunction at MachineFunctionPass.cpp:73:13
+//     #9:  `llvm::FPPassManager::runOnFunction at LegacyPassManager.cpp:1516:27
+//     #10:  `llvm::FPPassManager::runOnModule at LegacyPassManager.cpp:1552:16
+//     #11:  `(anonymous namespace)::MPPassManager::runOnModule at LegacyPassManager.cpp:1617:27
+//     #12:  `llvm::legacy::PassManagerImpl::run at LegacyPassManager.cpp:614:44
+//     #13:  `llvm::legacy::PassManager::run at LegacyPassManager.cpp:1737:14
+//     #14:  `compileModule at llc.cpp:650:8
+//     #15:  `main at llc.cpp:360:22
+//     #16:  `start + 4
 SDValue RISCVTargetLowering::LowerOperation(SDValue Op,
                                             SelectionDAG &DAG) const {
   switch (Op.getOpcode()) {

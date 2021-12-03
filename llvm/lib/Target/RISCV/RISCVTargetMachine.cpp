@@ -69,6 +69,12 @@ RISCVTargetMachine::RISCVTargetMachine(const Target &T, const Triple &TT,
   initAsmInfo();
 
   // RISC-V supports the MachineOutliner.
+  // This works by placing every instruction from every basic block in a
+  /// suffix tree, and repeatedly querying that tree for repeated sequences
+  /// of
+  /// instructions. If a sequence of instructions appears often, then it
+  /// ought
+  /// to be beneficial to pull out into a function.
   setMachineOutliner(true);
 }
 
@@ -131,7 +137,7 @@ public:
   void addPreSched2() override;
   void addPreRegAlloc() override;
 };
-}
+} // namespace
 
 TargetPassConfig *RISCVTargetMachine::createPassConfig(PassManagerBase &PM) {
   return new RISCVPassConfig(*this, PM);
