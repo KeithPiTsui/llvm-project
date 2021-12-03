@@ -1,0 +1,978 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=900, initial-scale=1'>
+    <title>hello</title>
+    <style>
+      html {
+        font-family: monospace;
+      }
+      #headertable {
+        width: 100%;
+      }
+      #rightmenu {
+        vertical-align: top;
+        text-align: right;
+      }
+      #rightmenu > * {
+        margin-top: 0px;
+      }
+      #credits {
+        color: #ddd;
+      }
+      #credits:hover {
+        color: #000;
+      }
+      #desc {
+        width: 250px;
+      }
+      #struct_infotables {
+        padding-right: 0px;
+      }
+      #data_infotables {
+        padding-left: 0px;
+      }
+      .conceal {
+        display: none;
+        border: 1px solid #000;
+        max-width: 600px;
+      }
+      #offsets {
+        display: inline-block;
+        text-align: right;
+      }
+      #bytes {
+        border: 1px solid;
+        display: inline-block;
+        word-break: break-word;
+        /* 16 bytes * (2 chars per byte + 1 space) - 1 final space + 1 due to a bug in chrome, where if
+         * you set width to X ch and put X characters, it may or may not wrap. */
+        width: 48ch;
+      }
+      #ascii {
+        border: 1px solid;
+        display: inline-block;
+        width: 16ch;
+      }
+      #vmap {
+        border: 1px solid;
+        display: inline-block;
+        width: 47ch;
+        vertical-align: top;
+        position: sticky;
+        top: 8px;
+      }
+      #sticky_table {
+        display: inline-block;
+        vertical-align: top;
+        position: sticky;
+        top: 8px;
+      }
+      #sticky_table > * {
+        vertical-align: top;
+      }
+      .hover:hover {
+        background-color: #ee9;
+      }
+
+      #ident {
+        background-color: #e99;
+      }
+      /* highlight children */
+      #ident:hover > * {
+        background-color: #ebb;
+      }
+      /* duplicate of .hover:hover with more specifity.
+       * used for elements like #magic, for whom
+       * rule #ident:hover > * would override .hover:hover rule */
+      #ident:hover > *.hover:hover {
+        background-color: #ee9;
+      }
+
+      /* same for #ehdr, but we also don't want to highlight #ident */
+      #ehdr {
+        background-color: #99e;
+      }
+      #ehdr:hover > *:not(#ident) {
+        background-color: #bbe;
+      }
+      #ehdr:hover > *.hover:hover:not(#ident) {
+        background-color: #ee9;
+      }
+
+      .phdr {
+        background-color: #eb9;
+      }
+      .phdr:hover > * {
+        background-color: #ed9;
+      }
+      .phdr_hover:hover {
+        background-color: #ef9;
+      }
+
+      .shdr {
+        background-color: #9be;
+      }
+      .shdr:hover > * {
+        background-color: #9de;
+      }
+      .shdr_hover:hover {
+        background-color: #9fe;
+      }
+
+      .segment {
+        background-color: #f99;
+      }
+      .section {
+        background-color: #f9f;
+      }
+      /* there are only sections inside segments due to code */
+      .segment > .section {
+        background: repeating-linear-gradient(
+          -45deg,
+          #f99,
+          #f99 10px,
+          #f9f 10px,
+          #f9f 20px
+        );
+      }
+      /* another duplicate of .hover:hover with more specifity */
+      .segment > .section.hover:hover {
+        background: initial;
+        background-color: #ee9;
+      }
+
+      .segment > .segment_subrange.hover:hover {
+        background: initial;
+        background-color: #f59;
+      }
+
+      svg {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        pointer-events: none;
+        overflow: visible;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width='100%' height='100%'>
+      <defs>
+        <marker id='arrowhead' viewBox='0 0 10 10' refX='10' refY='5' markerWidth='10' markerHeight='10' orient='auto'>
+          <path d='M 0 0 L 10 5 L 0 10 z' />
+        </marker>
+      </defs>
+      <g id='arrows' stroke='black' stroke-width='1' marker-end='url(#arrowhead)'></g>
+    </svg>
+    <table id='headertable'>
+      <td>
+        <table>
+          <tr id='info_file_name'> <td>File name:</td> <td>hello</td> </tr>
+          <tr id='info_file_size'> <td>File size:</td> <td>1.3 KiB (1336 B)</td> </tr>
+          <tr id='info_class'> <td>Object class:</td> <td>64-bit</td> </tr>
+          <tr id='info_data'> <td>Data encoding:</td> <td>Little endian</td> </tr>
+          <tr id='info_abi'> <td>ABI:</td> <td>SysV</td> </tr>
+          <tr id='info_e_type'> <td>Type:</td> <td>Executable file (EXEC)</td> </tr>
+          <tr id='info_e_machine'> <td>Architecture:</td> <td>RISC-V</td> </tr>
+          <tr id='info_e_entry'> <td>Entrypoint:</td> <td>0x11166</td> </tr>
+          <tr id='info_ph'> <td>Program headers:</td> <td><span id='info_e_phnum'>4</span> * <span id='info_e_phentsize'>56</span> @ <span id='info_e_phoff'>64</span></td> </tr>
+          <tr id='info_sh'> <td>Section headers:</td> <td><span id='info_e_shnum'>10</span> * <span id='info_e_shentsize'>64</span> @ <span id='info_e_shoff'>696</span></td> </tr>
+          <tr id='info_e_flags'> <td>Flags:</td> <td>0x5</td> </tr>
+        </table>
+      </td>
+      <td id='rightmenu'>
+        <p id='credits'>generated with elfcat 0.1.3</p>
+      </td>
+    </table>
+    <div id='offsets'></div>
+    <div id='bytes'>
+<span id='ehdr'><span id='ident'><span id='magic' class='hover'>7f &nbsp;E &nbsp;L &nbsp;F</span> <span id='class'>02</span> <span id='data'>01</span> <span id='ver' class='hover'>01</span> <span id='abi'>00</span> <span id='abi_ver' class='hover'>00</span> <span id='pad' class='hover'>00 00 00 00 00 00 00</span></span>
+<span id='e_type'>02 00</span> <span id='e_machine'>f3 00</span> <span id='e_version' class='hover'>01 00 00 00</span> <span id='e_entry'>66 11 01 00 00 00 00 00</span>
+<span id='e_phoff'>40 00 00 00 00 00 00 00</span> <span id='e_shoff'>b8 02 00 00 00 00 00 00</span>
+<span id='e_flags' class='hover'>05 00 00 00</span> <span id='e_ehsize' class='hover'>40 00</span> <span id='e_phentsize'>38 00</span> <span id='e_phnum'>04 00</span> <span id='e_shentsize'>40 00</span> <span id='e_shnum'>0a 00</span> <span id='e_shstrndx' class='hover'>08 00</span></span>
+<span id='bin_segment0' class='segment hover'><span id='bin_phdr0' class='phdr'><span class='p_type phdr_hover'>06 00 00 00</span> <span class='p_flags phdr_hover'>04 00 00 00</span> <span class='p_offset phdr_hover'>40 00 00 00 00 00 00 00</span>
+<span class='p_vaddr phdr_hover'>40 00 01 00 00 00 00 00</span> <span class='p_paddr phdr_hover'>40 00 01 00 00 00 00 00</span>
+<span class='p_filesz phdr_hover'>18 01 00 00 00 00 00 00</span> <span class='p_memsz phdr_hover'>18 01 00 00 00 00 00 00</span>
+<span class='p_align phdr_hover'>08 00 00 00 00 00 00 00</span></span> <span id='bin_phdr1' class='phdr'><span class='p_type phdr_hover'>01 00 00 00</span> <span class='p_flags phdr_hover'>04 00 00 00</span>
+<span class='p_offset phdr_hover'>00 00 00 00 00 00 00 00</span> <span class='p_vaddr phdr_hover'>00 00 01 00 00 00 00 00</span>
+<span class='p_paddr phdr_hover'>00 00 01 00 00 00 00 00</span> <span class='p_filesz phdr_hover'>65 01 00 00 00 00 00 00</span>
+<span class='p_memsz phdr_hover'>65 01 00 00 00 00 00 00</span> <span class='p_align phdr_hover'>00 10 00 00 00 00 00 00</span></span>
+<span id='bin_phdr2' class='phdr'><span class='p_type phdr_hover'>01 00 00 00</span> <span class='p_flags phdr_hover'>05 00 00 00</span> <span class='p_offset phdr_hover'>66 01 00 00 00 00 00 00</span>
+<span class='p_vaddr phdr_hover'>66 11 01 00 00 00 00 00</span> <span class='p_paddr phdr_hover'>66 11 01 00 00 00 00 00</span>
+<span class='p_filesz phdr_hover'>28 00 00 00 00 00 00 00</span> <span class='p_memsz phdr_hover'>28 00 00 00 00 00 00 00</span>
+<span class='p_align phdr_hover'>00 10 00 00 00 00 00 00</span></span> <span id='bin_phdr3' class='phdr'><span class='p_type phdr_hover'>51 e5 74 64</span> <span class='p_flags phdr_hover'>06 00 00 00</span>
+<span class='p_offset phdr_hover'>00 00 00 00 00 00 00 00</span> <span class='p_vaddr phdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='p_paddr phdr_hover'>00 00 00 00 00 00 00 00</span> <span class='p_filesz phdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='p_memsz phdr_hover'>00 00 00 00 00 00 00 00</span> <span class='p_align phdr_hover'>00 00 00 00 00 00 00 00</span></span>
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00</span> <span id='bin_section1' class='section hover'>48 65 6c 6c 6f 20 57 6f
+72 6c 64 0a 00</span> 00 <span id='bin_segment2' class='segment hover'><span id='bin_section2' class='section hover'>05 45 97 f5 ff ff 93 85 05 ff
+31 46 81 46 93 08 00 04 73 00 00 00 01 45 81 45
+01 46 81 46 93 08 d0 05 73 00 00 00 01 a0</span></span> <span id='bin_section5' class='section hover'>41 32
+00 00 00 72 69 73 63 76 00 01 28 00 00 00 05 72
+76 36 34 69 32 70 30 5f 6d 32 70 30 5f 61 32 70
+30 5f 66 32 70 30 5f 64 32 70 30 5f 63 32 70 30
+00</span> <span id='bin_section6' class='section hover'>4c 69 6e 6b 65 72 3a 20 4c 4c 44 20 31 31 2e
+31 2e 30 00</span> 00 00 00 00 <span id='bin_section7' class='section hover'>00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+01 00 00 00 00 00 01 00 58 01 01 00 00 00 00 00
+00 00 00 00 00 00 00 00 05 00 00 00 00 00 02 00
+8c 11 01 00 00 00 00 00 00 00 00 00 00 00 00 00
+0a 00 00 00 00 00 02 00 68 11 01 00 00 00 00 00
+00 00 00 00 00 00 00 00 10 00 00 00 10 00 02 00
+66 11 01 00 00 00 00 00 00 00 00 00 00 00 00 00</span>
+<span id='bin_section8' class='section hover'>00 2e 72 6f 64 61 74 61 00 2e 74 65 78 74 00 2e
+64 61 74 61 00 2e 62 73 73 00 2e 72 69 73 63 76
+2e 61 74 74 72 69 62 75 74 65 73 00 2e 63 6f 6d
+6d 65 6e 74 00 2e 73 79 6d 74 61 62 00 2e 73 68
+73 74 72 74 61 62 00 2e 73 74 72 74 61 62 00</span> <span id='bin_section9' class='section hover'>00
+6d 73 67 00 6c 6f 6f 70 00 2e 4c 31 02 31 00 5f
+73 74 61 72 74 00</span> 00 00 <span id='bin_shdr0' class='shdr'><span class='sh_name shdr_hover'>00 00 00 00</span> <span class='sh_type shdr_hover'>00 00 00 00</span>
+<span class='sh_flags shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr1' class='shdr'><span class='sh_name shdr_hover'>01 00 00 00</span> <span class='sh_type shdr_hover'>01 00 00 00</span>
+<span class='sh_flags shdr_hover'>02 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>58 01 01 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>58 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>0d 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr2' class='shdr'><span class='sh_name shdr_hover'>09 00 00 00</span> <span class='sh_type shdr_hover'>01 00 00 00</span>
+<span class='sh_flags shdr_hover'>06 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>66 11 01 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>66 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>28 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>02 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr3' class='shdr'><span class='sh_name shdr_hover'>0f 00 00 00</span> <span class='sh_type shdr_hover'>01 00 00 00</span>
+<span class='sh_flags shdr_hover'>03 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>8e 21 01 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>8e 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr4' class='shdr'><span class='sh_name shdr_hover'>15 00 00 00</span> <span class='sh_type shdr_hover'>08 00 00 00</span>
+<span class='sh_flags shdr_hover'>03 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>8e 21 01 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>8e 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr5' class='shdr'><span class='sh_name shdr_hover'>1a 00 00 00</span> <span class='sh_type shdr_hover'>03 00 00 70</span>
+<span class='sh_flags shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>8e 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>33 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr6' class='shdr'><span class='sh_name shdr_hover'>2c 00 00 00</span> <span class='sh_type shdr_hover'>01 00 00 00</span>
+<span class='sh_flags shdr_hover'>30 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>c1 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>13 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>01 00 00 00 00 00 00 00</span></span> <span id='bin_shdr7' class='shdr'><span class='sh_name shdr_hover'>35 00 00 00</span> <span class='sh_type shdr_hover'>02 00 00 00</span>
+<span class='sh_flags shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>d8 01 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>78 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>09 00 00 00</span> <span class='sh_info shdr_hover'>04 00 00 00</span> <span class='sh_addralign shdr_hover'>08 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>18 00 00 00 00 00 00 00</span></span> <span id='bin_shdr8' class='shdr'><span class='sh_name shdr_hover'>3d 00 00 00</span> <span class='sh_type shdr_hover'>03 00 00 00</span>
+<span class='sh_flags shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>50 02 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>4f 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span> <span id='bin_shdr9' class='shdr'><span class='sh_name shdr_hover'>47 00 00 00</span> <span class='sh_type shdr_hover'>03 00 00 00</span>
+<span class='sh_flags shdr_hover'>00 00 00 00 00 00 00 00</span> <span class='sh_addr shdr_hover'>00 00 00 00 00 00 00 00</span>
+<span class='sh_offset shdr_hover'>9f 02 00 00 00 00 00 00</span> <span class='sh_size shdr_hover'>17 00 00 00 00 00 00 00</span>
+<span class='sh_link shdr_hover'>00 00 00 00</span> <span class='sh_info shdr_hover'>00 00 00 00</span> <span class='sh_addralign shdr_hover'>01 00 00 00 00 00 00 00</span>
+<span class='sh_entsize shdr_hover'>00 00 00 00 00 00 00 00</span></span>     </div>
+    <div id='ascii'>
+.ELF............
+........f.......
+@...............
+....@.8...@.....
+........@.......
+@.......@.......
+................
+................
+................
+........e.......
+e...............
+........f.......
+f.......f.......
+(.......(.......
+........Q.td....
+................
+................
+................
+................
+................
+................
+........Hello.Wo
+rld....E........
+1F.F....s....E.E
+.F.F....s.....A2
+...riscv..(....r
+v64i2p0_m2p0_a2p
+0_f2p0_d2p0_c2p0
+.Linker:.LLD.11.
+1.0.............
+................
+........X.......
+................
+................
+........h.......
+................
+f...............
+..rodata..text..
+data..bss..riscv
+.attributes..com
+ment..symtab..sh
+strtab..strtab..
+msg.loop..L1.1._
+start...........
+................
+................
+................
+................
+........X.......
+X...............
+................
+................
+........f.......
+f.......(.......
+................
+................
+.........!......
+................
+................
+................
+.........!......
+................
+................
+...............p
+................
+........3.......
+................
+........,.......
+0...............
+................
+................
+........5.......
+................
+........x.......
+................
+........=.......
+................
+P.......O.......
+................
+........G.......
+................
+................
+................
+........    </div>
+    <table id='sticky_table' cellspacing='0'>
+      <tr>
+        <td id='desc'></td>
+        <td id='struct_infotables'>
+          <table class='conceal' id='info_phdr0'>
+            <tr> <td>Type:</td> <td>PHDR</td> </tr>
+            <tr> <td>Flags:</td> <td>R</td> </tr>
+            <tr> <td>Offset in file:</td> <td>64</td> </tr>
+            <tr> <td>Size in file:</td> <td>280</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x10040</td> </tr>
+            <tr> <td>Size in memory:</td> <td>0x118</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x8</td> </tr>
+          </table>
+          <table class='conceal' id='info_phdr1'>
+            <tr> <td>Type:</td> <td>LOAD</td> </tr>
+            <tr> <td>Flags:</td> <td>R</td> </tr>
+            <tr> <td>Offset in file:</td> <td>0</td> </tr>
+            <tr> <td>Size in file:</td> <td>357</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x10000</td> </tr>
+            <tr> <td>Size in memory:</td> <td>0x165</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1000</td> </tr>
+          </table>
+          <table class='conceal' id='info_phdr2'>
+            <tr> <td>Type:</td> <td>LOAD</td> </tr>
+            <tr> <td>Flags:</td> <td>RX</td> </tr>
+            <tr> <td>Offset in file:</td> <td>358</td> </tr>
+            <tr> <td>Size in file:</td> <td>40</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x11166</td> </tr>
+            <tr> <td>Size in memory:</td> <td>0x28</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1000</td> </tr>
+          </table>
+          <table class='conceal' id='info_phdr3'>
+            <tr> <td>Type:</td> <td>GNU_STACK (OS-specific)</td> </tr>
+            <tr> <td>Flags:</td> <td>RW</td> </tr>
+            <tr> <td>Offset in file:</td> <td>0</td> </tr>
+            <tr> <td>Size in file:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Size in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr0'>
+            <tr> <td>Name:</td> <td></td> </tr>
+            <tr> <td>Type:</td> <td>NULL</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>0</td> </tr>
+            <tr> <td>Size in file:</td> <td>0</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x0</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr1'>
+            <tr> <td>Name:</td> <td>.rodata</td> </tr>
+            <tr> <td>Type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Flags:</td> <td>A</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x10158</td> </tr>
+            <tr> <td>Offset in file:</td> <td>344</td> </tr>
+            <tr> <td>Size in file:</td> <td>13</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr2'>
+            <tr> <td>Name:</td> <td>.text</td> </tr>
+            <tr> <td>Type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Flags:</td> <td>AX</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x11166</td> </tr>
+            <tr> <td>Offset in file:</td> <td>358</td> </tr>
+            <tr> <td>Size in file:</td> <td>40</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x2</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr3'>
+            <tr> <td>Name:</td> <td>.data</td> </tr>
+            <tr> <td>Type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Flags:</td> <td>WA</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x1218e</td> </tr>
+            <tr> <td>Offset in file:</td> <td>398</td> </tr>
+            <tr> <td>Size in file:</td> <td>0</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr4'>
+            <tr> <td>Name:</td> <td>.bss</td> </tr>
+            <tr> <td>Type:</td> <td>NOBITS</td> </tr>
+            <tr> <td>Flags:</td> <td>WA</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x1218e</td> </tr>
+            <tr> <td>Offset in file:</td> <td>398</td> </tr>
+            <tr> <td>Size in file:</td> <td>0</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr5'>
+            <tr> <td>Name:</td> <td>.riscv.attributes</td> </tr>
+            <tr> <td>Type:</td> <td>Unknown: 1879048195</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>398</td> </tr>
+            <tr> <td>Size in file:</td> <td>51</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr6'>
+            <tr> <td>Name:</td> <td>.comment</td> </tr>
+            <tr> <td>Type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>449</td> </tr>
+            <tr> <td>Size in file:</td> <td>19</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>1</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr7'>
+            <tr> <td>Name:</td> <td>.symtab</td> </tr>
+            <tr> <td>Type:</td> <td>SYMTAB</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>472</td> </tr>
+            <tr> <td>Size in file:</td> <td>120</td> </tr>
+            <tr> <td>Linked section:</td> <td>9</td> </tr>
+            <tr> <td>Extra info:</td> <td>9</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x8</td> </tr>
+            <tr> <td>Size of entries:</td> <td>24</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr8'>
+            <tr> <td>Name:</td> <td>.shstrtab</td> </tr>
+            <tr> <td>Type:</td> <td>STRTAB</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>592</td> </tr>
+            <tr> <td>Size in file:</td> <td>79</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_shdr9'>
+            <tr> <td>Name:</td> <td>.strtab</td> </tr>
+            <tr> <td>Type:</td> <td>STRTAB</td> </tr>
+            <tr> <td>Flags:</td> <td>0</td> </tr>
+            <tr> <td>Vaddr in memory:</td> <td>0x0</td> </tr>
+            <tr> <td>Offset in file:</td> <td>671</td> </tr>
+            <tr> <td>Size in file:</td> <td>23</td> </tr>
+            <tr> <td>Linked section:</td> <td>0</td> </tr>
+            <tr> <td>Extra info:</td> <td>0</td> </tr>
+            <tr> <td>Alignment:</td> <td>0x1</td> </tr>
+            <tr> <td>Size of entries:</td> <td>0</td> </tr>
+          </table>
+        </td>
+        <td id='data_infotables'>
+          <table class='conceal' id='info_segment0'>
+            <tr> <td>Segment type:</td> <td>PHDR</td> </tr>
+            <tr> <td>Size in file:</td> <td>280</td> </tr>
+            <tr> <td>Size in memory:</td> <td>280</td> </tr>
+          </table>
+          <table class='conceal' id='info_segment1'>
+            <tr> <td>Segment type:</td> <td>LOAD</td> </tr>
+            <tr> <td>Size in file:</td> <td>357</td> </tr>
+            <tr> <td>Size in memory:</td> <td>357</td> </tr>
+          </table>
+          <table class='conceal' id='info_segment2'>
+            <tr> <td>Segment type:</td> <td>LOAD</td> </tr>
+            <tr> <td>Size in file:</td> <td>40</td> </tr>
+            <tr> <td>Size in memory:</td> <td>40</td> </tr>
+          </table>
+          <table class='conceal' id='info_segment3'>
+            <tr> <td>Segment type:</td> <td>GNU_STACK (OS-specific)</td> </tr>
+            <tr> <td>Size in file:</td> <td>0</td> </tr>
+            <tr> <td>Size in memory:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_section0'>
+            <tr> <td>Section type:</td> <td>NULL</td> </tr>
+            <tr> <td>Size:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_section1'>
+            <tr> <td>Section type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Size:</td> <td>13</td> </tr>
+          </table>
+          <table class='conceal' id='info_section2'>
+            <tr> <td>Section type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Size:</td> <td>40</td> </tr>
+          </table>
+          <table class='conceal' id='info_section3'>
+            <tr> <td>Section type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Size:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_section4'>
+            <tr> <td>Section type:</td> <td>NOBITS</td> </tr>
+            <tr> <td>Size:</td> <td>0</td> </tr>
+          </table>
+          <table class='conceal' id='info_section5'>
+            <tr> <td>Section type:</td> <td>Unknown: 1879048195</td> </tr>
+            <tr> <td>Size:</td> <td>51</td> </tr>
+          </table>
+          <table class='conceal' id='info_section6'>
+            <tr> <td>Section type:</td> <td>PROGBITS</td> </tr>
+            <tr> <td>Size:</td> <td>19</td> </tr>
+          </table>
+          <table class='conceal' id='info_section7'>
+            <tr> <td>Section type:</td> <td>SYMTAB</td> </tr>
+            <tr> <td>Size:</td> <td>120</td> </tr>
+          </table>
+          <table class='conceal' id='info_section8'>
+            <tr> <td>Section type:</td> <td>STRTAB</td> </tr>
+            <tr> <td>Size:</td> <td>79</td> </tr>
+            <tr><td><br></td></tr>
+            <tr>
+              <td></td>
+              <td>
+                <div>
+                  .rodata
+                  .text
+                  .data
+                  .bss
+                  .riscv.attributes
+                  .comment
+                  .symtab
+                  .shstrtab
+                  .strtab
+                </div>
+              </td>
+            </tr>
+          </table>
+          <table class='conceal' id='info_section9'>
+            <tr> <td>Section type:</td> <td>STRTAB</td> </tr>
+            <tr> <td>Size:</td> <td>23</td> </tr>
+            <tr><td><br></td></tr>
+            <tr>
+              <td></td>
+              <td>
+                <div>
+                  msg
+                  loop
+                  .L11
+                  _start
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <script type='text/javascript'>
+      var color = "#ee9";
+
+      function addPairHighlighting(elem, depElem) {
+          elem.addEventListener("mouseenter", function(event) {
+              event.target.style.backgroundColor = color;
+              depElem.style.backgroundColor = color;
+          }, false);
+
+          elem.addEventListener("mouseleave", function(event) {
+              event.target.style.backgroundColor = "";
+              depElem.style.backgroundColor = "";
+          }, false);
+      }
+
+      function highlightIds(primaryId, secondaryId) {
+          var primaryElem = document.getElementById(primaryId);
+          var secondaryElem = document.getElementById(secondaryId);
+
+          if (primaryElem === null || secondaryElem === null) {
+              return;
+          }
+
+          addPairHighlighting(primaryElem, secondaryElem);
+          addPairHighlighting(secondaryElem, primaryElem);
+      }
+
+      highlightIds('class', 'info_class')
+      highlightIds('data', 'info_data')
+      highlightIds('abi', 'info_abi')
+      highlightIds('abi_ver', 'info_abi_ver')
+      highlightIds('e_type', 'info_e_type')
+      highlightIds('e_machine', 'info_e_machine')
+      highlightIds('e_entry', 'info_e_entry')
+      highlightIds('e_phoff', 'info_e_phoff')
+      highlightIds('e_shoff', 'info_e_shoff')
+      highlightIds('e_flags', 'info_e_flags')
+      highlightIds('e_ehsize', 'info_e_ehsize')
+      highlightIds('e_phentsize', 'info_e_phentsize')
+      highlightIds('e_phnum', 'info_e_phnum')
+      highlightIds('e_shentsize', 'info_e_shentsize')
+      highlightIds('e_shnum', 'info_e_shnum')
+      highlightIds('e_shstrndx', 'info_e_shstrndx')
+    </script>
+    <script type='text/javascript'>
+      let label = document.getElementById('desc')
+      let descriptions = {
+          ehdr:         "ELF file header (ehdr)",
+          ident:        "Identifier (e_ident)",
+          magic:        "Magic (EI_MAG0 .. EI_MAG3)",
+          class:        "Object file class (EI_CLASS)",
+          data:         "Data encoding (EI_DATA)",
+          ver:          "File version, should be 1 (EI_VERSION)",
+          abi:          "ABI (EI_OSABI)",
+          abi_ver:      "ABI version, should be 0 for SysV (EI_ABIVERSION)",
+          pad:          "Identifier padding",
+          e_type:       "Object file type (e_type)",
+          e_machine:    "Object file type (e_machine)",
+          e_version:    "File version, should be 1 (e_version)",
+          e_entry:      "Entrypoint vaddr (e_entry)",
+          e_phoff:      "Offset in file to program header table (e_phoff)",
+          e_shoff:      "Offset in file to section header table (e_shoff)",
+          e_flags:      "Processor-specific flags (e_flags)",
+          e_ehsize:     "Size of ELF file header (e_ehsize)",
+          e_phentsize:  "Size of a program header table entry (e_phentsize)",
+          e_phnum:      "Number of program header table entries (e_phnum)",
+          e_shentsize:  "Size of a section header table entry (e_shentsize)",
+          e_shnum:      "Number of section header table entries (e_shnum)",
+          e_shstrndx:   "What section is a string table (e_shstrndx)",
+          phdr:         "Program header",
+          p_type:       "Segment type (p_type)",
+          p_flags:      "Segment flags (p_flags)",
+          p_offset:     "Offset in file (p_offset)",
+          p_vaddr:      "Virtual address in memory (p_vaddr)",
+          p_paddr:      "Reserved for physical address in memory (p_paddr)",
+          p_filesz:     "Size of segment in file (p_filesz)",
+          p_memsz:      "Size of segment in memory (p_memsz)",
+          p_align:      "Alignment (p_align)",
+          segment:      "Segment",
+          shdr:         "Section header",
+          sh_name:      "Offset to the section name string table containing this section name (sh_name)",
+          sh_type:      "Section type (sh_type)",
+          sh_flags:     "Section flags (sh_flags)",
+          sh_addr:      "Virtual address in memory. Should be 0 if not put into memory (sh_addr)",
+          sh_offset:    "Offset in file (sh_offset)",
+          sh_size:      "Section size. Also size in file unless type is SHT_NOBITS (sh_size)",
+          sh_link:      "Section index of an associated section (sh_link)",
+          sh_info:      "Additional information about section (sh_info)",
+          sh_addralign: "Address alignment of the section (sh_addralign)",
+          sh_entsize:   "Size of each entry if section has table of fixed-size entries (sh_entsize)",
+          section:      "Section",
+          segment_and_section: "Segment and section",
+      }
+      let separator = "<br>&#x2193<br>";
+
+      function stripInfoPrefix(str) {
+          return str.replace("info_", "");
+      }
+
+      function stripBinPrefix(str) {
+          return str.replace("bin_", "");
+      }
+
+      function hasDescription(id) {
+          return descriptions[id] !== undefined
+              || descriptions[stripInfoPrefix(id)] !== undefined
+              || descriptions[stripBinPrefix(id)] !== undefined;
+      }
+
+      function isValid(id) {
+          return id !== "" && hasDescription(id);
+      }
+
+      function formatDesc(id) {
+          if (descriptions[id] !== undefined) {
+              return descriptions[id];
+          }
+
+          if (descriptions[stripBinPrefix(id)] !== undefined) {
+              return descriptions[stripBinPrefix(id)];
+          }
+
+          return descriptions[stripInfoPrefix(id)];
+      }
+
+      function iterateParents(el) {
+          var txt = "";
+          var keywords = [];
+
+          do {
+              if (el.id !== undefined) {
+                  keywords.push(el.id);
+              }
+
+              var classList = el.classList;
+              if (classList !== undefined) {
+                  for (var i = 0; i < classList.length; ++i) {
+                      keywords.push(classList[i]);
+                  }
+              }
+
+              el = el.parentNode;
+          } while (el !== null && el.tagName !== "HTML")
+
+          // fix all occurences where segments and sections overlap.
+          // once again we are relying on programming by which sections are always inside segments.
+          // also, this is O(n^2) ugly.
+          var i = 1;
+          while (i < keywords.length) {
+              if (keywords[i] !== 'segment') {
+                  ++i;
+                  continue;
+              }
+
+              var have_section_before = false;
+              var j = 0;
+              for (; j < i; ++j) {
+                  if (keywords[j] == 'section') {
+                      have_section_before = true;
+                      break;
+                  }
+              }
+
+              if (have_section_before) {
+                  keywords[i] = 'segment_and_section';
+                  keywords.splice(j, 1);
+              } else {
+                  ++i;
+              }
+          }
+
+          for (var i = 0; i < keywords.length; ++i) {
+              var keyword = keywords[i];
+
+              if (isValid(keyword)) {
+                  if (txt === "") {
+                      txt = formatDesc(keyword);
+                  } else {
+                      txt = formatDesc(keyword) + separator + txt;
+                  }
+              }
+          }
+
+          return txt;
+      }
+
+      document.addEventListener("mouseover", function (e) {
+          var event = e || window.event;
+
+          var target = event.target || event.srcElement;
+
+          document.getElementById('desc').innerHTML = iterateParents(target);
+      }, false);
+    </script>
+    <script type='text/javascript'>
+      function listOfParents(el) {
+          var list = [el.id];
+
+          while (el.tagName !== "HTML") {
+              el = el.parentNode;
+
+              // use unshift() instead of push() because we are stupid and have
+              // an assumption that section spans are inside segment spans
+              // so that break; in loop below doesn't have to go away.
+              list.unshift(el.id);
+          }
+
+          return list;
+      }
+
+      var prevTableId;
+
+      document.addEventListener("mouseover", function (e) {
+          var event = e || window.event;
+          var target = event.target || event.srcElement;
+          var prefix = 'bin_';
+
+          parents = listOfParents(target);
+
+          for (var i = 0; i < parents.length; i++) {
+              var id = parents[i];
+
+              if (id.startsWith(prefix)) {
+                  var tableId = id.replace(prefix, "info_");
+                  var target = document.getElementById(tableId);
+
+                  if (target !== null) {
+                      if (prevTableId) {
+                          prevTableId.style.display = "none";
+                      }
+
+                      target.style.display = "block";
+                      prevTableId = target;
+
+                      break;
+                  }
+              }
+          }
+      }, false);
+    </script>
+    <script type='text/javascript'>
+      let fileLen = 1336
+      function populateOffsets(columns) {
+          let rows = Math.ceil(fileLen / columns);
+          let elements = "";
+          var offset = 0;
+
+          for (var i = 0; i < rows; ++i) {
+              elements += offset.toString(16) + "</br>\n";
+              offset += columns;
+          }
+
+          document.getElementById('offsets').innerHTML = elements;
+      }
+      populateOffsets(16)
+    </script>
+    <script type='text/javascript'>
+      function getAbsPosition(elem) {
+          var x = 0, y = 0;
+
+          do {
+              x += elem.offsetLeft || 0;
+              y += elem.offsetTop || 0;
+
+              elem = elem.offsetParent;
+          } while (elem);
+
+          return {
+              x: x,
+              y: y
+          };
+      }
+
+      function getBoundingBoxSizes(elem) {
+          var rect = elem.getBoundingClientRect();
+
+          return {
+              w: rect.width || elem.offsetWidth,
+              h: rect.height || elem.offsetHeight
+          };
+      }
+
+      function addSvgArrow(elem1, elem2) {
+          var off1 = getAbsPosition(elem1);
+          var off2 = getAbsPosition(elem2);
+
+          var bb1 = getBoundingBoxSizes(elem1);
+
+          var x1 = off1.x + bb1.w / 2;
+          var y1 = off1.y;
+
+          var x2 = off2.x;
+          var y2 = off2.y;
+
+          document.getElementById('arrows').innerHTML += '<line '
+              + 'x1="' + x1 + '" y1="' + y1 + '" '
+              + 'x2="' + x2 + '" y2="' + y2 + '" '
+              + '/>';
+      }
+
+      function jumpToElem(elem) {
+          elem.scrollIntoView();
+      }
+
+      function setJumpCallback(elemFrom, elemTo) {
+          elemFrom.addEventListener("click", function(e) {
+              jumpToElem(elemTo);
+          }, true);
+      }
+
+      function connect(sel1, sel2) {
+          var elem1 = document.querySelector(sel1);
+          var elem2 = document.querySelector(sel2);
+
+          if (elem1 === null || elem2 === null) {
+              return;
+          }
+
+          connections.push([elem1, elem2]);
+
+          addSvgArrow(elem1, elem2);
+
+          setJumpCallback(elem1, elem2);
+          setJumpCallback(elem2, elem1);
+      }
+
+      var connections = [];
+
+      function clearArrows() {
+          document.getElementById('arrows').innerHTML = '';
+      }
+
+      function redrawArrows() {
+          clearArrows();
+
+          for (var i = 0; i < connections.length; ++i) {
+              var conn = connections[i];
+
+              addSvgArrow(conn[0], conn[1]);
+          }
+      }
+
+      window.onresize = function() {
+          redrawArrows();
+      }
+
+      connect('#e_phoff', '#bin_phdr0');
+      connect('#e_shoff', '#bin_shdr0');
+      connect('#bin_phdr0 > .p_offset', '#bin_segment0');
+      connect('#bin_phdr1 > .p_offset', '#bin_segment1');
+      connect('#bin_phdr2 > .p_offset', '#bin_segment2');
+      connect('#bin_phdr3 > .p_offset', '#bin_segment3');
+      connect('#bin_shdr0 > .sh_offset', '#bin_section0');
+      connect('#bin_shdr1 > .sh_offset', '#bin_section1');
+      connect('#bin_shdr2 > .sh_offset', '#bin_section2');
+      connect('#bin_shdr3 > .sh_offset', '#bin_section3');
+      connect('#bin_shdr4 > .sh_offset', '#bin_section4');
+      connect('#bin_shdr5 > .sh_offset', '#bin_section5');
+      connect('#bin_shdr6 > .sh_offset', '#bin_section6');
+      connect('#bin_shdr7 > .sh_offset', '#bin_section7');
+      connect('#bin_shdr8 > .sh_offset', '#bin_section8');
+      connect('#bin_shdr9 > .sh_offset', '#bin_section9');
+    </script>
+  </body>
+</html>
